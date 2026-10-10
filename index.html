@@ -1,0 +1,1782 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OneCareer Bulk Publisher</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>:root{--navy:#0B1220;--or:#FF6B35;--tl:#12B8A6;--bg:#F5F7FA;--bd:#E3E8EF;--mu:#5B6675;--rd:#E5484D;--gn:#1F9D55}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px/1.5 Inter,system-ui,sans-serif;color:#101828}
+h1,h2,b.d{font-family:Sora,sans-serif}header{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#0B1220,#1b2740);color:#fff;padding:14px 24px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center}
+header small{display:block;color:#9AA5B8;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+nav{display:flex;gap:8px;flex-wrap:wrap}nav button{font:600 12.5px Sora;color:#fff;background:#ffffff14;border:1px solid #ffffff30;border-radius:99px;padding:8px 16px;cursor:pointer}nav button.on{background:var(--or);border-color:var(--or)}
+main{max-width:1240px;margin:24px auto;padding:0 20px 60px}section{display:none}section.on{display:block}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:22px;margin-bottom:18px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);margin:0 0 14px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}label{display:block;font-weight:600;font-size:12px;margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1.5px solid var(--bd);border-radius:8px;font:inherit;background:#fff}textarea{min-height:70px}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--or)}
+.btn{font:600 13px Sora;border:0;border-radius:8px;padding:10px 18px;cursor:pointer;background:var(--navy);color:#fff}.btn.p{background:var(--or)}.btn.t{background:var(--tl)}.btn.o{background:#fff;color:#101828;border:1.5px solid var(--bd)}.btn.s{padding:6px 11px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}.hint{font-size:12px;color:var(--mu);margin-top:6px}
+#drop{border:2px dashed #c5cdd9;border-radius:14px;padding:44px 20px;text-align:center;cursor:pointer;background:#fafbfd}#drop.h{border-color:var(--or);background:#fff6f0}#drop b{font-size:17px}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;font-size:11px;text-transform:uppercase;color:var(--mu);padding:8px;border-bottom:2px solid var(--bd)}td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:middle}.sc{overflow-x:auto}
+.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}.ok{background:#EAFBF3;color:var(--gn)}.er{background:#FEF2F2;color:var(--rd)}.pn{background:#EEF2FF;color:#4F46E5}.th{width:44px;height:32px;object-fit:cover;border-radius:5px;vertical-align:middle}
+#log{background:var(--navy);color:#cfe3ff;border-radius:8px;padding:12px;font:12px/1.6 monospace;height:200px;overflow:auto;white-space:pre-wrap;margin-top:12px}
+.bar{height:8px;background:var(--bd);border-radius:9px;overflow:hidden;margin-top:12px}.bar i{display:block;height:100%;width:0;background:var(--or);transition:.3s}
+#modal{position:fixed;inset:0;background:#0b122099;display:none;z-index:50;overflow:auto;padding:30px 12px}#modal.on{display:block}#mb{background:#fff;border-radius:14px;max-width:900px;margin:auto;padding:22px}
+iframe{width:100%;height:420px;border:1px solid var(--bd);border-radius:8px;margin-top:10px}.err{color:var(--rd);font-size:11.5px}
+</style></head><body>
+<div id="engine" style="display:none"><div id="panel-job1"></div><div id="panel-job2"></div></div>
+<header><div><b class="d" style="font-size:17px">OneCareer Bulk Publisher</b><small>Upload → Structure → Blogger · onecareer.co.za</small></div>
+<nav><button data-t="1" class="on">1 Setup</button><button data-t="2">2 Upload</button><button data-t="3">3 Review</button><button data-t="4">4 Send to Blogger</button></nav></header>
+<main>
+<section id="s1" class="on"><div class="card"><h2>Blogger connection</h2><div class="g">
+<div><label>Google OAuth Client ID</label><input id="clientId" placeholder="xxxx.apps.googleusercontent.com"></div>
+<div><label>Blogger Blog ID</label><input id="blogId" placeholder="1234567890123456789"></div></div>
+<label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input id="draft" type="checkbox" checked style="width:auto"> Send as drafts first (review in Blogger, then publish)</label>
+<div class="row"><button class="btn" id="conn">Connect to Blogger</button><span id="cst" class="pill pn">Not connected</span></div>
+<p class="hint">Host this file on an https address (e.g. GitHub Pages) and add that address as an Authorized JavaScript origin for the Client ID (Blogger API v3 enabled). It will not sign in from a local file.</p></div>
+<div class="card"><h2>Site defaults (written into every post)</h2><div class="g">
+<div><label>Site URL / OneCareer feed source</label><input id="siteUrl" value="https://www.onecareer.co.za"></div>
+<div><label>Author name</label><input id="authorName" value="OneCareer Editorial Team"></div>
+<div><label>Author URL</label><input id="authorUrl"></div>
+<div><label>Publisher name</label><input id="pubName" value="OneCareer"></div>
+<div><label>Publisher logo URL</label><input id="pubLogo"></div>
+<div><label>Default image URL (used when a post has no upload)</label><input id="defImg"></div>
+<div><label>Public image URL for schema (optional)</label><input id="schemaImg"></div>
+<div><label>OneCareer links per post</label><input id="nLinks" type="number" min="0" max="10" value="5"></div></div></div></section>
+<section id="s2"><div class="card"><h2>Upload your vacancies</h2>
+<div id="drop"><b class="d">Drop a PDF, Excel, CSV or PowerPoint here</b><div class="hint">or click to browse · .pdf .xlsx .xls .csv .pptx · multiple files allowed</div></div>
+<input id="file" type="file" multiple accept=".pdf,.xlsx,.xls,.csv,.pptx" style="display:none">
+<div class="row"><button class="btn o s" id="tpl">⬇ Excel template (best accuracy)</button><span class="hint">Excel/CSV: one row = one job. PDF/PowerPoint: one page/slide = one job, or several jobs split on "Job Title:" lines.</span></div>
+<div id="up" class="hint"></div></div></section>
+<section id="s3"><div class="card"><h2>Review &amp; fix</h2><div class="row" style="margin:0 0 12px">
+<button class="btn t s" id="ocb">🔗 Fetch OneCareer links</button><button class="btn o s" id="rev">Re-validate all</button>
+<button class="btn o s" id="allimg">🖼 Image for all without one</button><button class="btn o s" id="clr">Clear list</button><span id="sum" class="hint"></span></div>
+<div class="sc"><table><thead><tr><th></th><th>#</th><th>Title</th><th>Employer</th><th>Location</th><th>Closes</th><th>Image</th><th>Links</th><th>Status</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="hint">Uploaded images appear on the page. Google's JobPosting image needs a public URL: set one in Setup or paste an image URL per post.</p></div></section>
+<section id="s4"><div class="card"><h2>Send to Blogger</h2><div class="row" style="margin:0"><button class="btn p" id="send">Send selected (max 50)</button><button class="btn o s" id="selv">Select first 50 valid</button><span id="cnt" class="hint"></span></div>
+<div class="bar"><i id="pb"></i></div><div id="log">Activity will appear here…</div></div></section>
+</main><div id="modal"><div id="mb"></div></div>
+<input id="imgf" type="file" accept="image/*" style="display:none">
+
+<script>
+/* ============================================================ DATA ============================================================ */
+
+var PROVINCE_CITIES = {
+"Western Cape":[["Cape Town","8001"],["Stellenbosch","7600"],["Paarl","7646"],["George","6529"],["Worcester","6849"],["Bellville","7530"],["Mitchells Plain","7785"],["Khayelitsha","7784"],["Somerset West","7130"],["Mossel Bay","6500"],["Knysna","6570"],["Oudtshoorn","6620"],["Hermanus","7200"],["Vredenburg","7380"],["Malmesbury","7300"],["Ceres","6835"],["Beaufort West","6970"],["Robertson","6705"],["Swellendam","6740"],["Plettenberg Bay","6600"]],
+"Gauteng":[["Johannesburg","2000"],["Pretoria","0001"],["Sandton","2196"],["Soweto","1804"],["Centurion","0157"],["Midrand","1685"],["Randburg","2194"],["Roodepoort","1724"],["Boksburg","1459"],["Benoni","1500"],["Germiston","1401"],["Kempton Park","1619"],["Vereeniging","1930"],["Vanderbijlpark","1911"],["Krugersdorp","1739"],["Springs","1559"],["Alberton","1449"],["Randfontein","1759"],["Brakpan","1540"],["Tembisa","1632"]],
+"Eastern Cape":[["Gqeberha (Port Elizabeth)","6001"],["East London","5200"],["Mthatha","5099"],["Uitenhage","6229"],["Makhanda","6139"],["Komani","5320"],["King William's Town","5600"],["Butterworth","4960"],["Graaff-Reinet","6280"],["Port Alfred","6170"],["Jeffreys Bay","6330"],["Aliwal North","9750"],["Cradock","5880"],["Humansdorp","6300"],["Bhisho","5605"],["Fort Beaufort","5720"],["Somerset East","5850"],["Zwelitsha","5608"],["Idutywa","5000"],["Lady Frere","5410"]],
+"KwaZulu-Natal":[["Durban","4001"],["Pietermaritzburg","3201"],["Newcastle","2940"],["Richards Bay","3900"],["Pinetown","3610"],["Umlazi","4031"],["Ladysmith","3370"],["Empangeni","3880"],["Vryheid","3100"],["Kokstad","4700"],["Estcourt","3310"],["Howick","3290"],["Margate","4275"],["Port Shepstone","4240"],["Ballito","4420"],["KwaDukuza (Stanger)","4450"],["Dundee","3000"],["Ulundi","3838"],["Eshowe","3815"],["Hluhluwe","3960"]],
+"Free State":[["Bloemfontein","9300"],["Welkom","9459"],["Bethlehem","9700"],["Kroonstad","9499"],["Sasolburg","1947"],["Parys","9585"],["Virginia","9430"],["Odendaalsrus","9480"],["Harrismith","9880"],["Phuthaditjhaba","9866"],["Ficksburg","9730"],["Ladybrand","9745"],["Bethulie","9992"],["Zastron","9950"],["Senekal","9600"],["Frankfort","9830"],["Heilbron","9650"],["Reitz","9810"],["Excelsior","9760"],["Petrusburg","9932"]],
+"Limpopo":[["Polokwane","0700"],["Tzaneen","0850"],["Thohoyandou","0950"],["Musina","0900"],["Makhado","0920"],["Mokopane","0600"],["Lebowakgomo","0737"],["Giyani","0826"],["Phalaborwa","1390"],["Bela-Bela","0480"],["Modimolle","0510"],["Lephalale","0555"],["Groblersdal","0470"],["Mookgophong","0560"],["Hoedspruit","1380"],["Jane Furse","1085"],["Burgersfort","1150"],["Malamulele","0982"],["Duiwelskloof","0835"],["Vuwani","0955"]],
+"Mpumalanga":[["Mbombela (Nelspruit)","1200"],["eMalahleni (Witbank)","1035"],["Secunda","2302"],["Middelburg","1055"],["Barberton","1300"],["White River","1240"],["Ermelo","2350"],["Standerton","2430"],["Volksrust","2470"],["eMkhondo (Piet Retief)","2380"],["Bethal","2310"],["Delmas","2210"],["Carolina","1185"],["Mashishing (Lydenburg)","1120"],["Sabie","1260"],["Graskop","1270"],["Malelane","1320"],["Komatipoort","1340"],["Hazyview","1242"],["Amsterdam","2375"]],
+"North West":[["Rustenburg","0300"],["Potchefstroom","2531"],["Mahikeng","2745"],["Klerksdorp","2570"],["Brits","0250"],["Vryburg","8600"],["Zeerust","2865"],["Lichtenburg","2740"],["Christiana","2680"],["Ventersdorp","2710"],["Koster","0348"],["Schweizer-Reneke","2780"],["Taung","8580"],["Wolmaransstad","2630"],["Coligny","2725"],["Delareyville","2770"],["Stella","8650"],["Hartbeespoort","0216"],["Mogwase","0302"],["Sun City","0316"]],
+"Northern Cape":[["Kimberley","8301"],["Upington","8801"],["Springbok","8240"],["Kuruman","8460"],["De Aar","7000"],["Colesberg","9795"],["Postmasburg","8420"],["Kathu","8446"],["Calvinia","8190"],["Prieska","8940"],["Victoria West","7070"],["Carnarvon","8925"],["Britstown","8782"],["Douglas","8730"],["Barkly West","8375"],["Warrenton","8530"],["Alexander Bay","8290"],["Port Nolloth","8280"],["Sutherland","6920"],["Fraserburg","6980"]]
+};
+
+var CATEGORIES = ["Department of Roads and Transport","Bank","Retail","Construction","Hospital","Matric","SAPS","Call center","Pharmacy","General Worker","Messenger","House keeper","Department of Education","Department of Health","Cleaner","Driver","Government","Government Jobs","Municipality","Engineering"];
+
+var otherJobs = [{name:'',url:''},{name:'',url:''},{name:'',url:''}];
+
+/* ============================================================ FORM TEMPLATE ============================================================ */
+
+function jobFormHTML(idx){
+  var catOpts = '<option value="">Select a category</option>' + CATEGORIES.map(function(c){return '<option>'+c+'</option>';}).join('');
+  return ''+
+  '<div class="grid">'+
+  '<div>'+
+
+  '<div class="card"><h2 class="section-title">Job '+idx+' — Basics</h2>'+
+  '<div id="expiryBanner_'+idx+'"></div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="jobRef_'+idx+'">Job Reference / ID</label><input id="jobRef_'+idx+'" placeholder="e.g., JOB123" type="text"><span class="error" id="jobRef_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="required" for="title_'+idx+'">Job Title</label><input id="title_'+idx+'" oninput="updateSeo('+idx+')" placeholder="e.g., Software Engineer" type="text"><span class="error" id="title_'+idx+'Err"></span></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label for="category_'+idx+'">Job Category</label><select id="category_'+idx+'">'+catOpts+'</select></div>'+
+    '<div class="form-group"><label for="focusKeyword_'+idx+'">Focus SEO Keyword</label><input id="focusKeyword_'+idx+'" oninput="updateSeo('+idx+')" placeholder="e.g., government jobs Gauteng" type="text"></div>'+
+  '</div>'+
+  '<div class="form-group"><label for="genTitle_'+idx+'">Generated SEO Title / Post Heading</label><input id="genTitle_'+idx+'" oninput="updateSeo('+idx+')" type="text">'+
+    '<button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="makeTitle('+idx+')">Generate SEO Title</button></div>'+
+  '<div class="form-group"><label for="metaDesc_'+idx+'">Meta Description (shown as an overview under the title)</label>'+
+    '<textarea id="metaDesc_'+idx+'" oninput="updateSeo('+idx+')" style="min-height:60px" placeholder="A concise, compelling 120–155 character summary of this vacancy for search results"></textarea>'+
+    '<div class="charcount" id="metaDescCount_'+idx+'">0 / 155</div></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Description</h2>'+
+    '<div class="form-group"><label class="required" for="dIntro_'+idx+'">Introduction</label><textarea id="dIntro_'+idx+'" oninput="updateSeo('+idx+')" placeholder="Brief introduction to the job role"></textarea><span class="error" id="dIntro_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="opt" for="dCompany_'+idx+'">About the Company</label><textarea id="dCompany_'+idx+'" oninput="updateSeo('+idx+')" placeholder="Information about the company"></textarea></div>'+
+    '<div class="form-group"><label class="required" for="dResp_'+idx+'">Responsibilities</label><textarea id="dResp_'+idx+'" oninput="updateSeo('+idx+')" placeholder="List of job responsibilities"></textarea><span class="error" id="dResp_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="required" for="dQual_'+idx+'">Required Qualifications</label><textarea id="dQual_'+idx+'" oninput="updateSeo('+idx+')" placeholder="Required qualifications and skills"></textarea><span class="error" id="dQual_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="opt" for="dBenefits_'+idx+'">Job Benefits &amp; Perks</label><textarea id="dBenefits_'+idx+'" oninput="updateSeo('+idx+')" placeholder="Benefits and perks offered"></textarea></div>'+
+    '<div class="form-group"><label class="opt" for="dApply_'+idx+'">How to Apply</label><textarea id="dApply_'+idx+'" oninput="updateSeo('+idx+')" placeholder="Instructions on how to apply — required if you don\'t have an Apply Link below (e.g. email, phone number, or physical address)"></textarea></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Requirements Detail <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(recommended by Google)</span></h2>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="eduReq_'+idx+'">Education Requirement</label><select id="eduReq_'+idx+'" onchange="updateSeo('+idx+')">'+
+      '<option value="">Not specified</option><option value="no requirements">No formal requirements</option>'+
+      '<option value="high school">High school</option><option value="associate degree">Associate degree</option>'+
+      '<option value="bachelor degree">Bachelor degree</option><option value="professional certificate">Professional certificate</option>'+
+      '<option value="postgraduate degree">Postgraduate degree</option></select></div>'+
+    '<div class="form-group"><label class="opt" for="expMonths_'+idx+'">Minimum Experience (months)</label><input id="expMonths_'+idx+'" oninput="updateSeo('+idx+')" placeholder="e.g., 24 (leave blank if none required)" type="number" min="0"></div>'+
+  '</div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Dates &amp; Employment</h2>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="datePosted_'+idx+'">Date Posted (official source date)</label><input id="datePosted_'+idx+'" type="datetime-local"><span class="help">Use the date on the official advert or circular, not today. Google uses this as the freshness signal. <a href="#" onclick="f(\'datePosted\','+idx+').value=localDT();return false">Use now</a> (SAST)</span><span class="error" id="datePosted_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="required" for="closing_'+idx+'">Closing Date &amp; Time</label><input id="closing_'+idx+'" type="datetime-local" onchange="updateBanner('+idx+')"><div class="countdown" id="countdown_'+idx+'"></div><span class="error" id="closing_'+idx+'Err"></span></div>'+
+  '</div>'+
+  '<div class="info-box"><b>Blogger auto-expiry</b>Each post checks its own closing date on load and swaps in a "Position Closed" notice automatically once it passes. Install the theme snippet in the Publish tab once so expired posts also hide from your listing pages.</div>'+
+  '<div class="form-group"><label class="required" for="empType_'+idx+'">Employment Type</label><select id="empType_'+idx+'" multiple>'+
+    '<option value="FULL_TIME">Full Time</option><option value="PART_TIME">Part Time</option><option value="CONTRACTOR">Contractor</option>'+
+    '<option value="TEMPORARY">Temporary</option><option value="INTERN">Intern</option><option value="VOLUNTEER">Volunteer</option>'+
+    '<option value="PER_DIEM">Per Diem</option><option value="OTHER">Other</option></select><span class="error" id="empType_'+idx+'Err"></span></div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="orgName_'+idx+'">Company Name</label><input id="orgName_'+idx+'" placeholder="e.g., Government Department" type="text"><span class="error" id="orgName_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="opt" for="orgLogo_'+idx+'">Company Logo URL</label><input id="orgLogo_'+idx+'" placeholder="https://example.com/logo.png" type="url"><span class="error" id="orgLogo_'+idx+'Err"></span></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="orgUrl_'+idx+'">Company Website (hiringOrganization.sameAs)</label><input id="orgUrl_'+idx+'" oninput="updateSeo('+idx+')" placeholder="https://company.co.za" type="url"><span class="help">A recommended Google property that confirms this is a real, verifiable employer.</span></div>'+
+    '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;font-weight:500;margin-top:22px">'+
+      '<input id="anonEmployer_'+idx+'" type="checkbox" style="width:auto" onchange="updateSeo('+idx+')"> Hiring anonymously (e.g. recruitment agency on behalf of an undisclosed employer)</label></div>'+
+  '</div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Remote Work &amp; Direct Apply</h2>'+
+  '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;font-weight:500">'+
+    '<input id="remote_'+idx+'" type="checkbox" style="width:auto" onchange="toggleRemote('+idx+')"> This job can be performed 100% remotely (work from home)</label>'+
+    '<span class="help">Only tick this if the role is fully remote — not for occasional/hybrid work-from-home. The job description must also say so in plain text.</span></div>'+
+  '<div id="remoteFields_'+idx+'" style="display:none">'+
+    '<div class="form-group"><label class="required" for="applicantLoc_'+idx+'">Applicant Location Requirement (where remote applicants may be based)</label><input id="applicantLoc_'+idx+'" placeholder="e.g., South Africa" type="text"><span class="help">Required by Google for remote roles — at least one country.</span></div>'+
+  '</div>'+
+  '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;font-weight:500">'+
+    '<input id="directApply_'+idx+'" type="checkbox" style="width:auto"> This posting offers Direct Apply (applicant can apply in one short step — email, phone, or a simple form — no repeated logins)</label>'+
+    '<span class="help">A recommended Google property (<code>directApply</code>). Only tick it if that\'s genuinely true for your Apply Link / How to Apply instructions below.</span></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Location'+'</h2>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="province_'+idx+'">Province</label><select id="province_'+idx+'" onchange="updateCityList('+idx+')"><option value="">Select a province</option></select><span class="error" id="province_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="required" for="city_'+idx+'">City / Town</label><input id="city_'+idx+'" list="cityList_'+idx+'" oninput="updatePostal('+idx+')" placeholder="Type or pick the main city"><datalist id="cityList_'+idx+'"></datalist><span class="error" id="city_'+idx+'Err"></span></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="postal_'+idx+'">Postal Code</label><input id="postal_'+idx+'" placeholder="Auto-filled if recognised, editable" type="text"></div>'+
+    '<div class="form-group"><label class="required" for="country_'+idx+'">Country</label><select id="country_'+idx+'"><option value="ZA">South Africa</option></select></div>'+
+  '</div>'+
+  '<div class="divider"></div>'+
+  '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;font-weight:500">'+
+    '<input id="multiLoc_'+idx+'" type="checkbox" style="width:auto" onchange="renderCityPicker('+idx+')"> This exact vacancy genuinely has confirmed openings in more than one town</label></div>'+
+  '<div class="info-box" style="background:#FEF6F0;border-left-color:var(--red)">'+
+    '<b>Read before ticking</b>Google\'s job posting content policy treats <code>jobLocation</code> as "the physical location(s) of the business where the employee will report to work" and explicitly disallows "providing false location data that does not match the actual location of the job." Listing every town in a province as a <code>jobLocation</code> for a single-branch vacancy is location spam and risks a manual action against your whole site. Only tick the box above — and only pick the specific towns below — if this employer is actually hiring in each one right now.'+
+  '</div>'+
+  '<div id="cityPicker_'+idx+'" class="form-group" style="display:none"></div>'+
+  '<div id="cityPreview_'+idx+'" class="form-group"></div>'+
+  '<div class="form-group"><label style="display:flex;align-items:flex-start;gap:8px;font-weight:500">'+
+    '<input id="multiLocConfirm_'+idx+'" type="checkbox" style="width:auto;margin-top:3px">'+
+    '<span>I have checked the official advert and it names <b>every town ticked above</b> as a place this post is based. I am not adding towns for search traffic.</span></label>'+
+    '<span class="error" id="multiLocConfirm_'+idx+'Err"></span></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Compensation</h2>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="salMin_'+idx+'">Minimum Salary / Stipend (ZAR)</label><input id="salMin_'+idx+'" placeholder="e.g., 50000" type="number"><span class="error" id="salMin_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="opt" for="salMax_'+idx+'">Maximum Salary / Stipend (ZAR)</label><input id="salMax_'+idx+'" placeholder="e.g., 80000" type="number"><span class="error" id="salMax_'+idx+'Err"></span></div>'+
+  '</div>'+
+  '<div class="form-group"><label class="required" for="salUnit_'+idx+'">Salary Unit</label><select id="salUnit_'+idx+'">'+
+    '<option value="YEAR">Per Year</option><option value="MONTH">Per Month</option><option value="WEEK">Per Week</option><option value="DAY">Per Day</option><option value="HOUR">Per Hour</option></select><span class="help">Match the advert exactly. Internship, WIL and stipend amounts are almost always <b>per month</b>; an annual unit on a figure like R6 131 would publish wrong data. Leave both amounts blank if the advert says market related or gives no pay.</span></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Google Jobs Extras <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(OneCareer)</span></h2>'+
+  '<div class="info-box" style="background:#EEF7FF;border-left-color:#2563EB"><b>What these add</b>Breadcrumb hub links (province and department), a verified source line with a last-checked date, the street address, duration and application email. Everything entered here is shown on the page <i>and</i> placed in the structured data, because Google requires markup to match visible content.</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="siteUrl_'+idx+'">Site URL</label><input id="siteUrl_'+idx+'" type="url" placeholder="https://www.onecareer.co.za"><span class="error" id="siteUrl_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="opt" for="deptLabel_'+idx+'">Department / Employer Label (breadcrumb hub)</label><input id="deptLabel_'+idx+'" type="text" placeholder="Defaults to Company Name"><span class="help">Becomes a Blogger label, so keep the spelling identical across every post of the same employer. Google groups More jobs at this employer by name.</span></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="streetAddress_'+idx+'">Street Address</label><input id="streetAddress_'+idx+'" type="text" placeholder="e.g., 159 Struben Street (leave blank if not in the advert)"><span class="help">Only a real street address. Never put the city here.</span></div>'+
+    '<div class="form-group"><label class="opt" for="duration_'+idx+'">Duration / Contract Length</label><input id="duration_'+idx+'" type="text" placeholder="e.g., 12 months"></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="applyEmail_'+idx+'">Application Email</label><input id="applyEmail_'+idx+'" type="email" placeholder="recruitment@department.gov.za"><span class="error" id="applyEmail_'+idx+'Err"></span><span class="help">Added to the How to Apply section. List only the address that applies to this post.</span></div>'+
+    '<div class="form-group"><label class="opt" for="lastChecked_'+idx+'">Last Checked Against Source</label><input id="lastChecked_'+idx+'" type="date"></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="sourceUrl_'+idx+'">Official Source URL (advert / circular PDF)</label><input id="sourceUrl_'+idx+'" type="url" placeholder="https://www.dpsa.gov.za/..."><span class="error" id="sourceUrl_'+idx+'Err"></span></div>'+
+    '<div class="form-group"><label class="opt" for="sourceLabel_'+idx+'">Source Label</label><input id="sourceLabel_'+idx+'" type="text" placeholder="e.g., DPSA Public Service Vacancy Circular 34 of 2026"></div>'+
+  '</div>'+
+  '<div class="form-group"><label class="opt" for="sourceLogo_'+idx+'">Source Logo URL (e.g. DPSA crest)</label><input id="sourceLogo_'+idx+'" type="url" placeholder="https://blogger.googleusercontent.com/.../DPSA.png"><span class="help">Shown beside the Official source line only. It is not put in the employer markup, because the DPSA publishes the circular but is not the hiring department.</span></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Media &amp; Apply</h2>'+
+    '<div class="form-group"><label class="opt" for="imgUrl_'+idx+'">Job Posting Image URL</label><input id="imgUrl_'+idx+'" oninput="updateSeo('+idx+')" placeholder="https://example.com/image.png" type="url"></div>'+
+    '<div class="form-group"><label class="opt" for="applyUrl_'+idx+'">Apply Link <span style="font-weight:400;color:var(--muted)">(required if you didn\'t fill in "How to Apply" above)</span></label><input id="applyUrl_'+idx+'" oninput="updateSeo('+idx+')" placeholder="https://company.com/apply" type="url"><span class="error" id="applyUrl_'+idx+'Err"></span></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Article Info — For Google Search &amp; Discover</h2>'+
+    '<div class="info-box" style="background:#EEF7FF;border-left-color:#2563EB">'+
+      '<b>What this adds</b>Alongside the JobPosting data (used for Google for Jobs), this generates a second <code>Article</code> structured-data block for the same post. It gives Google a byline, publish/update dates and a site publisher — the signals used for regular Search and Discover surfacing of article-style content. It intentionally uses <code>Article</code> rather than <code>NewsArticle</code>, since NewsArticle is meant for outlets enrolled in Google News.'+
+    '</div>'+
+    '<div class="row">'+
+      '<div class="form-group"><label class="opt" for="authorName_'+idx+'">Author Name</label><input id="authorName_'+idx+'" placeholder="e.g., OneCareer Editorial Team" type="text"></div>'+
+      '<div class="form-group"><label class="opt" for="authorUrl_'+idx+'">Author URL</label><input id="authorUrl_'+idx+'" placeholder="https://onecareer.co.za/about" type="url"></div>'+
+    '</div>'+
+    '<div class="row">'+
+      '<div class="form-group"><label class="opt" for="pubName_'+idx+'">Publisher / Site Name</label><input id="pubName_'+idx+'" placeholder="e.g., OneCareer" type="text"></div>'+
+      '<div class="form-group"><label class="opt" for="pubLogo_'+idx+'">Publisher Logo URL</label><input id="pubLogo_'+idx+'" placeholder="https://onecareer.co.za/logo.png" type="url"><span class="help">A square logo, ideally 600×60px or larger — your site logo, not the company logo.</span></div>'+
+    '</div>'+
+    '<div class="row">'+
+      '<div class="form-group"><label class="opt" for="postUrl_'+idx+'">Final Blogger Post URL</label><input id="postUrl_'+idx+'" placeholder="Paste after first publishing, then regenerate" type="url"><span class="help">Optional — fills <code>mainEntityOfPage</code>. Leave blank if publishing for the first time.</span></div>'+
+      '<div class="form-group"><label class="opt" for="dateModified_'+idx+'">Date Modified</label><input id="dateModified_'+idx+'" type="datetime-local"><span class="help">Leave blank to reuse Date Posted.</span></div>'+
+    '</div>'+
+    '<button class="btn btn-primary" onclick="go('+idx+')">Generate Code</button>'+
+  '</div>'+
+
+  '<div class="card out-section"><h2 class="section-title">Blogger Post HTML</h2>'+
+    '<p>Switch to <b>HTML view</b> in the Blogger post editor and paste this block — or connect Blogger in the Publish tab and send it straight there.</p>'+'<div class="info-box" style="background:#FEF6F0;border-left-color:var(--red)"><b>Always fill in the Blogger title box</b>Type the post title into Blogger\'s own title field before you paste. If you leave it empty, Blogger invents a permalink from whatever text it finds first — which is how slugs like <code>context-httpsschema.html</code> happen. Structured data is now placed at the end of the block to protect against this, but the title box is the real fix.</div>'+
+    '<textarea id="outPost_'+idx+'" readonly rows="16"></textarea>'+
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" id="copyPost_'+idx+'" onclick="copyText(\'outPost_'+idx+'\')">Copy Post HTML</button></div>'+
+  '</div>'+
+  '<div class="card"><h2 class="section-title">Blogger Post Settings</h2><p class="help">The Blogger API cannot set the permalink or search description. Copy them into the editor sidebar before publishing. The permalink cannot be changed afterwards. Labels are sent automatically when you publish from the Publish tab; add them by hand if you paste the HTML yourself.</p><textarea id="outSettings_'+idx+'" readonly rows="8"></textarea><div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="copyText(\'outSettings_'+idx+'\')">Copy Settings</button></div></div>'+
+
+  '</div>'+
+
+  '<div class="side">'+
+  '<div class="card gauge-wrap">'+
+    '<h2 class="section-title" style="text-align:left">SEO Score</h2>'+
+    '<div class="gauge" id="gauge_'+idx+'"><div class="gauge-inner"><b id="gaugeScore_'+idx+'">0</b><span>/ 100</span></div></div>'+
+    '<ul class="seo-list" id="seoChecklist_'+idx+'"></ul>'+
+  '</div>'+
+  '<div class="card"><h2 class="section-title" style="text-align:left">Google Jobs Check</h2><p class="help">Runs on every generation against the markup that was actually produced. Confirm in the Rich Results Test once live.</p><ul class="seo-list" id="jobLint_'+idx+'"><li style="color:var(--muted)">Click Generate Code to run the check.</li></ul></div>'+
+  '</div>'+
+
+  '</div>';
+}
+
+/* ============================================================ STANDALONE ARTICLE (NOT TIED TO A JOB) ============================================================ */
+
+var articleSections = [{h:'',c:''},{h:'',c:''},{h:'',c:''}];
+var articleLinks = [{name:'',url:''},{name:'',url:''}];
+var flashcards = [{q:'',a:''},{q:'',a:''},{q:'',a:''}];
+
+function af(field){return document.getElementById('art_'+field);}
+
+function articleFormHTML(){
+  return ''+
+  '<div class="grid">'+
+  '<div>'+
+
+  '<div class="card"><h2 class="section-title">Article — Basics</h2>'+
+  '<div class="info-box" style="background:#EEF7FF;border-left-color:#2563EB"><b>Built for Blogger</b>This generates a <code>BlogPosting</code> JSON-LD block following Google\'s Article guidelines (no required properties - all recommended ones are filled when you supply them). Blogger uses its own title box as the page H1, so the body below starts at H2. Fill in Blogger\'s title box, search description, permalink and labels from the <b>Blogger Post Settings</b> box after generating.</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="art_title">Article Title (H1)</label><input id="art_title" oninput="updateArticleSeo()" placeholder="e.g., How to Fill Out a Z83 Form Correctly in 2026" type="text"><span class="error" id="art_titleErr"></span><span class="charcount" id="art_titleCount">0 / 60</span></div>'+
+    '<div class="form-group"><label class="required" for="art_focusKeyword">Focus Keyword</label><input id="art_focusKeyword" oninput="updateArticleSeo();suggestKeywords()" placeholder="e.g., Z83 form" type="text"><span class="error" id="art_focusKeywordErr"></span></div>'+
+  '</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="art_secondary">Secondary / LSI Keywords <span style="font-weight:400;color:var(--muted)">(comma-separated)</span></label><input id="art_secondary" oninput="updateArticleSeo()" placeholder="e.g., Z83 download, how to complete Z83, government application form"></div>'+
+    '<div class="form-group"><label class="opt" for="art_category">Category / Tags</label><input id="art_category" placeholder="e.g., Application Tips, Government Jobs"></div>'+
+  '</div>'+
+  '<div class="form-group"><label for="art_slug">URL Slug Preview</label><input id="art_slug" oninput="updateArticleSeo()" placeholder="auto-suggested-from-title, editable"><button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="makeSlug()">Suggest Slug From Title</button></div>'+
+  '<div class="form-group"><label for="art_metaDesc">Meta Description</label><textarea id="art_metaDesc" oninput="updateArticleSeo()" style="min-height:60px" maxlength="150" placeholder="110–150 characters (Blogger limit is 150), include the focus keyword, written to earn the click"></textarea><div class="charcount" id="art_metaDescCount">0 / 150</div></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Content</h2>'+
+    '<div class="form-group"><label class="required" for="art_intro">Introduction <span style="font-weight:400;color:var(--muted)">(use the focus keyword in the first sentence)</span></label><textarea id="art_intro" oninput="updateArticleSeo()" style="min-height:100px" placeholder="Open with the focus keyword and what the reader gets from this article"></textarea><span class="error" id="art_introErr"></span></div>'+
+    '<div id="articleSectionsEditor"></div>'+
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="addArticleSection()">+ Add Section (H2)</button></div>'+
+    '<div class="form-group" style="margin-top:14px"><label class="opt" for="art_conclusion">Conclusion / Call to Action</label><textarea id="art_conclusion" oninput="updateArticleSeo()" placeholder="Wrap up and tell the reader what to do next"></textarea></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Internal / Related Links</h2>'+
+    '<p class="help" style="margin-bottom:10px">Link to related job posts or guides already on your site. Counts toward the internal-linking SEO check and helps Google crawl deeper into your site.</p>'+
+    '<table class="other-jobs-editor" id="articleLinksEditor"></table>'+
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="addArticleLinkRow()">+ Add Row</button></div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Study Flashcards <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(optional — Education Q&amp;A rich result)</span></h2>'+
+  '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;font-weight:500">'+
+    '<input id="art_eduEnabled" type="checkbox" style="width:auto" onchange="toggleEduSection()"> This article includes a genuine study/revision flashcard section</label>'+
+    '<span class="help">Only tick this if the article is actually educational (a study guide, exam-prep, how-to-fill-a-form explainer, etc.) — not for a plain vacancy listing.</span></div>'+
+  '<div class="info-box" style="background:#EEF7FF;border-left-color:#2563EB">'+
+    '<b>Before you turn this on</b>Google only shows the Education Q&amp;A carousel for pages with genuine flashcard-style question/answer pairs on an education-related topic, and only for searches in English, Portuguese, Vietnamese (worldwide) or Spanish (Mexico). All questions must use its fixed <code>Flashcard</code> type, must be real, accurate, and must appear as visible content on the page — not just inside the markup. You are responsible for the accuracy of these flashcards; low-quality or inaccurate sets can make Google stop showing all of your Q&amp;A pages in this feature. This is a separate <code>Quiz</code> structured-data block added alongside your <code>Article</code> block — Google does not support merging the two into a single type — but both live in the same generated post as one cohesive study article.'+
+  '</div>'+
+  '<div id="eduFields_wrap" style="display:none">'+
+    '<div class="row">'+
+      '<div class="form-group"><label class="opt" for="art_eduTopic">Topic / Concept <span style="font-weight:400;color:var(--muted)">(schema: about.name)</span></label><input id="art_eduTopic" oninput="updateArticleSeo()" placeholder="e.g., Completing the Z83 Government Application Form"></div>'+
+      '<div class="form-group"><label class="opt" for="art_eduSubject">Educational Subject</label><input id="art_eduSubject" oninput="updateArticleSeo()" placeholder="e.g., Job Application Skills, Public Administration"></div>'+
+    '</div>'+
+    '<div class="form-group"><label class="opt" for="art_eduLevel">Target Audience / Level <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="art_eduLevel" placeholder="e.g., First-time job seekers, Adult learners"></div>'+
+    '<div class="form-group"><label>Flashcards <span style="font-weight:400;color:var(--muted)">(question on one side, answer on the other — add at least 2 real ones)</span></label>'+
+      '<table class="other-jobs-editor" id="flashcardsEditor"></table>'+
+      '<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="addFlashcardRow()">+ Add Flashcard</button></div>'+
+    '</div>'+
+  '</div>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Author, Trust &amp; Sources</h2>'+
+  '<div class="info-box" style="background:#EEF7FF;border-left-color:#2563EB"><b>Why this matters</b>Google asks who made the content, how and why. A real byline linking to an about page, cited sources and an honest AI disclosure all build trust. Use a real author - never an invented one.</div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label for="art_authorType">Author Is</label><select id="art_authorType"><option value="Person">A person</option><option value="Organization">An organization</option></select></div>'+
+    '<div class="form-group"><label class="required" for="art_authorName">Author Name <span style="font-weight:400;color:var(--muted)">(name only, no job title or "posted by")</span></label><input id="art_authorName" oninput="updateArticleSeo()" placeholder="e.g., OneCareer Editorial Team" type="text"></div>'+
+  '</div>'+
+  '<div class="form-group"><label class="required" for="art_authorUrl">Author URL <span style="font-weight:400;color:var(--muted)">(about/bio page that identifies the author)</span></label><input id="art_authorUrl" oninput="updateArticleSeo()" placeholder="https://yourblog.blogspot.com/p/about.html" type="url"></div>'+
+  '<div class="form-group"><label class="opt" for="art_authorBio">Author Bio <span style="font-weight:400;color:var(--muted)">(shown in an author box)</span></label><textarea id="art_authorBio" style="min-height:60px" placeholder="Who writes this and why they know the topic"></textarea></div>'+
+  '<div class="form-group"><label class="opt" for="art_takeaways">Key Takeaways <span style="font-weight:400;color:var(--muted)">(one per line, 3-5 short answers - helps snippets and skimmers)</span></label><textarea id="art_takeaways" oninput="updateArticleSeo()" style="min-height:70px"></textarea></div>'+
+  '<div class="form-group"><label class="opt" for="art_sources">Sources <span style="font-weight:400;color:var(--muted)">(one per line: Name | https://url)</span></label><textarea id="art_sources" oninput="updateArticleSeo()" style="min-height:70px" placeholder="Department of Public Service | https://www.dpsa.gov.za/"></textarea></div>'+
+  '<label style="display:flex;align-items:center;gap:8px;font-weight:500"><input id="art_aiDisclosure" type="checkbox" style="width:auto"> Add a disclosure that AI helped draft this and the author reviewed it (tick only if true)</label>'+
+  '</div>'+
+
+  '<div class="card"><h2 class="section-title">Media, Publisher &amp; Dates</h2>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="art_imgUrl">Featured Image URL <span style="font-weight:400;color:var(--muted)">(1200px+ wide, not a logo)</span></label><input id="art_imgUrl" oninput="updateArticleSeo()" placeholder="https://blogger.googleusercontent.com/img/..." type="url"></div>'+
+    '<div class="form-group"><label class="opt" for="art_imgAlt">Image Alt Text</label><input id="art_imgAlt" oninput="updateArticleSeo()" placeholder="Describe the image; include the focus keyword if natural"></div>'+
+  '</div>'+
+  '<label style="display:flex;align-items:center;gap:8px;font-weight:500;margin-bottom:14px"><input id="art_imgAuto" type="checkbox" style="width:auto" checked> Auto-create 1:1, 4:3 and 16:9 crops (Blogger-hosted images only; Google recommends all three)</label>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="opt" for="art_pubName">Publisher / Site Name</label><input id="art_pubName" oninput="updateArticleSeo()" placeholder="e.g., OneCareer" type="text"></div>'+
+    '<div class="form-group"><label class="opt" for="art_pubUrl">Site URL</label><input id="art_pubUrl" placeholder="https://yourblog.blogspot.com/" type="url"></div>'+
+  '</div>'+
+  '<div class="form-group"><label class="opt" for="art_pubLogo">Publisher Logo URL</label><input id="art_pubLogo" type="url"></div>'+
+  '<div class="row">'+
+    '<div class="form-group"><label class="required" for="art_datePosted">Date Published <span style="font-weight:400;color:var(--muted)">(match the date Blogger will publish)</span></label><input id="art_datePosted" type="datetime-local"><span class="error" id="art_datePostedErr"></span></div>'+
+    '<div class="form-group"><label class="opt" for="art_dateModified">Date Modified <span style="font-weight:400;color:var(--muted)">(only when you genuinely update the content)</span></label><input id="art_dateModified" type="datetime-local"></div>'+
+  '</div>'+
+  '<div class="form-group"><label class="opt" for="art_postUrl">Final Blogger Post URL <span style="font-weight:400;color:var(--muted)">(after first publish, paste it and regenerate: fills @id and mainEntityOfPage)</span></label><input id="art_postUrl" type="url"></div>'+
+  '<button class="btn btn-primary" onclick="goArticle()">Generate Article Code</button>'+
+  '</div>'+
+
+  '<div class="card out-section"><h2 class="section-title">Blogger Post HTML — Article</h2>'+
+    '<p>Switch to <b>HTML view</b> in the Blogger post editor and paste this block — or connect Blogger in the Publish tab and click "Publish Article".</p>'+
+    '<textarea id="art_outPost" readonly rows="16"></textarea>'+
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="copyText(\'art_outPost\')">Copy Article HTML</button></div>'+
+  '</div>'+
+  '<div class="card"><h2 class="section-title">Structured Data Check</h2><p class="help">Runs on every generation. Always confirm in Google Rich Results Test once the post is live.</p><ul class="seo-list" id="art_lint"><li style="color:var(--muted)">Generate the code to run the check.</li></ul></div>'+
+  '<div class="card"><h2 class="section-title">Blogger Post Settings</h2><p class="help">The Blogger API cannot set the permalink or search description, so copy these into the editor sidebar. The permalink cannot be changed after publishing.</p><textarea id="art_outSettings" readonly rows="8"></textarea><div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="copyText(\'art_outSettings\')">Copy Settings</button></div></div>'+
+
+  '</div>'+
+
+  '<div class="side">'+
+  '<div class="card gauge-wrap">'+
+    '<h2 class="section-title" style="text-align:left">Article SEO Score</h2>'+
+    '<div class="gauge" id="art_gauge"><div class="gauge-inner"><b id="art_gaugeScore">0</b><span>/ 100</span></div></div>'+
+    '<ul class="seo-list" id="art_seoChecklist"></ul>'+
+  '</div>'+
+  '<div class="card">'+
+    '<h2 class="section-title" style="text-align:left">Keyword Angle Ideas</h2>'+
+    '<p class="help" style="margin:0 0 8px">Heuristic angle suggestions from your focus keyword and common SA job-search modifiers — not live search-volume data. Cross-check in Google Trends or Search Console before committing.</p>'+
+    '<div id="art_keywordIdeas" class="seo-list"></div>'+
+  '</div>'+
+  '</div>'+
+
+  '</div>';
+}
+
+function renderArticleSectionsEditor(){
+  var wrap=document.getElementById('articleSectionsEditor');
+  if(!wrap) return;
+  var html='';
+  articleSections.forEach(function(s,i){
+    html+='<div style="background:#FAFBFC;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px">'+
+      '<div class="row">'+
+        '<div class="form-group" style="margin-bottom:8px"><label>Section '+(i+1)+' Heading (H2)</label><input type="text" value="'+s.h.replace(/"/g,'&quot;')+'" oninput="articleSections['+i+'].h=this.value;updateArticleSeo()" placeholder="e.g., Documents You Need to Attach"></div>'+
+        '<div style="display:flex;align-items:flex-end;padding-bottom:14px"><button class="small-x" onclick="removeArticleSection('+i+')" title="Remove section">✕</button></div>'+
+      '</div>'+
+      '<div class="form-group" style="margin-bottom:0"><textarea oninput="articleSections['+i+'].c=this.value;updateArticleSeo()" placeholder="Section content">'+s.c.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</textarea></div>'+
+    '</div>';
+  });
+  wrap.innerHTML=html;
+}
+function addArticleSection(){articleSections.push({h:'',c:''});renderArticleSectionsEditor();updateArticleSeo();}
+function removeArticleSection(i){articleSections.splice(i,1);renderArticleSectionsEditor();updateArticleSeo();}
+
+function renderArticleLinksEditor(){
+  var tbl=document.getElementById('articleLinksEditor');
+  if(!tbl) return;
+  var html='<tr><td style="font-weight:600;font-size:12px;color:var(--muted)">Link Text</td><td style="font-weight:600;font-size:12px;color:var(--muted)">URL</td><td></td></tr>';
+  articleLinks.forEach(function(row,i){
+    html+='<tr>'+
+      '<td><input type="text" value="'+row.name.replace(/"/g,'&quot;')+'" placeholder="e.g., SAPS Vacancies 2026" oninput="articleLinks['+i+'].name=this.value;updateArticleSeo()"></td>'+
+      '<td><input type="url" value="'+row.url.replace(/"/g,'&quot;')+'" placeholder="https://…" oninput="articleLinks['+i+'].url=this.value;updateArticleSeo()"></td>'+
+      '<td><button class="small-x" onclick="removeArticleLinkRow('+i+')" title="Remove">✕</button></td>'+
+      '</tr>';
+  });
+  tbl.innerHTML=html;
+}
+function addArticleLinkRow(){articleLinks.push({name:'',url:''});renderArticleLinksEditor();}
+function removeArticleLinkRow(i){articleLinks.splice(i,1);renderArticleLinksEditor();updateArticleSeo();}
+
+/* ---- Study Flashcards (Education Q&A) ---- */
+
+function toggleEduSection(){
+  var on=document.getElementById('art_eduEnabled').checked;
+  document.getElementById('eduFields_wrap').style.display = on ? 'block' : 'none';
+  updateArticleSeo();
+}
+function renderFlashcardsEditor(){
+  var tbl=document.getElementById('flashcardsEditor');
+  if(!tbl) return;
+  var html='<tr><td style="font-weight:600;font-size:12px;color:var(--muted)">Question (front)</td><td style="font-weight:600;font-size:12px;color:var(--muted)">Answer (back)</td><td></td></tr>';
+  flashcards.forEach(function(row,i){
+    html+='<tr>'+
+      '<td><input type="text" value="'+row.q.replace(/"/g,'&quot;')+'" placeholder="e.g., What form must be completed for every SA government job application?" oninput="flashcards['+i+'].q=this.value;updateArticleSeo()"></td>'+
+      '<td><input type="text" value="'+row.a.replace(/"/g,'&quot;')+'" placeholder="e.g., The Z83 form" oninput="flashcards['+i+'].a=this.value;updateArticleSeo()"></td>'+
+      '<td><button class="small-x" onclick="removeFlashcardRow('+i+')" title="Remove">✕</button></td>'+
+      '</tr>';
+  });
+  tbl.innerHTML=html;
+}
+function addFlashcardRow(){flashcards.push({q:'',a:''});renderFlashcardsEditor();}
+function removeFlashcardRow(i){flashcards.splice(i,1);renderFlashcardsEditor();updateArticleSeo();}
+function validFlashcards(){return flashcards.filter(function(c){return c.q.trim() && c.a.trim();});}
+function articleLinksHTML(){
+  var rows=articleLinks.filter(function(r){return r.name.trim() && r.url.trim();});
+  if(!rows.length) return '';
+  var out='<h2 style="color:#222;margin-top:32px;">Related Reading</h2>\n<ul style="font-size:16px;line-height:2;">\n';
+  rows.forEach(function(r){
+    out+='  <li><a href="'+r.url+'" rel="noopener">'+r.name+'</a></li>\n';
+  });
+  out+='</ul>';
+  return out;
+}
+
+function makeSlug(){
+  var t=af('title').value||'';
+  var slug=t.toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+  af('slug').value=slug;
+  updateArticleSeo();
+}
+
+function suggestKeywords(){
+  var kw=(af('focusKeyword').value||'').trim();
+  var box=document.getElementById('art_keywordIdeas');
+  if(!box) return;
+  if(!kw){box.innerHTML='<li style="padding:6px 0;color:var(--muted)">Type a focus keyword to see angle ideas.</li>';return;}
+  var y=new Date().getFullYear();
+  var mods=[
+    kw+' in South Africa', kw+' '+y, kw+' requirements', kw+' salary',
+    'how to apply for '+kw, kw+' closing date', kw+' online application',
+    'how to become a '+kw, 'best '+kw+' tips', kw+' near me',
+    kw+' qualifications needed', kw+' interview questions', kw+' vacancies '+y
+  ];
+  box.innerHTML=mods.map(function(m){return '<div style="padding:5px 0;border-bottom:1px dashed var(--border)">'+m+'</div>';}).join('');
+}
+
+function syllableCount(word){
+  word=word.toLowerCase().replace(/[^a-z]/g,'');
+  if(!word) return 0;
+  var groups=word.match(/[aeiouy]+/g);
+  var count=groups?groups.length:1;
+  if(word.length>2 && word.endsWith('e') && !word.endsWith('le')) count--;
+  return Math.max(count,1);
+}
+function wordCount(text){return ((text||'').trim().match(/\S+/g)||[]).length;}
+function fleschScore(text){
+  var sentences=((text||'').match(/[.!?]+/g)||['.']).length;
+  var words=(text||'').trim().match(/\S+/g)||[];
+  var wc=words.length||1;
+  var syl=words.reduce(function(a,w){return a+syllableCount(w);},0);
+  return Math.round(206.835-1.015*(wc/Math.max(sentences,1))-84.6*(syl/wc));
+}
+function keywordDensity(text,kw){
+  if(!kw) return 0;
+  var words=wordCount(text)||1;
+  var re=new RegExp('\\b'+kw.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi');
+  var hits=((text||'').match(re)||[]).length;
+  return (hits/words)*100;
+}
+function articleFullText(){
+  var parts=[af('intro').value];
+  articleSections.forEach(function(s){parts.push(s.h);parts.push(s.c);});
+  parts.push(af('conclusion').value);
+  return parts.join(' ').trim();
+}
+
+function updateArticleSeo(){
+  if(!af('title')) return;
+  var title=af('title').value||'';
+  document.getElementById('art_titleCount').textContent=title.length+' / 60';
+  var kw=(af('focusKeyword').value||'').trim(), kwLower=kw.toLowerCase();
+  var meta=af('metaDesc').value||'';
+  var mc=document.getElementById('art_metaDescCount');
+  mc.textContent=meta.length+' / 150';
+  mc.style.color=(meta.length>=110&&meta.length<=150)?'#1F9D55':(meta.length===0?'#5B6675':'#C98A00');
+
+  var slug=(af('slug').value||'').toLowerCase();
+  var fullText=articleFullText();
+  var wc=wordCount(fullText);
+  var density=keywordDensity(fullText,kw);
+  var secondary=(af('secondary').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var secondaryHits=secondary.filter(function(s){return fullText.toLowerCase().indexOf(s.toLowerCase())!==-1;});
+  var hasH2WithKw=articleSections.some(function(s){return kwLower && s.h.toLowerCase().indexOf(kwLower)!==-1;});
+  var first100=fullText.split(/\s+/).slice(0,100).join(' ').toLowerCase();
+  var fre=fleschScore(fullText||'.');
+  var internalLinks=articleLinks.filter(function(r){return r.name.trim()&&r.url.trim();}).length;
+  var sectionCount=articleSections.filter(function(s){return s.h.trim();}).length;
+
+  var checks=[
+    {label:'Title 50–60 characters', ok: title.length>=50 && title.length<=60},
+    {label:'Focus keyword in title', ok: !!kw && title.toLowerCase().indexOf(kwLower)!==-1},
+    {label:'Meta description 110–150 chars (Blogger limit)', ok: meta.length>=110 && meta.length<=150},
+    {label:'Focus keyword in meta description', ok: !!kw && meta.toLowerCase().indexOf(kwLower)!==-1},
+    {label:'Focus keyword in URL slug', ok: !!kw && slug.indexOf(kwLower.replace(/\s+/g,'-'))!==-1},
+    {label:'Focus keyword in first 100 words', ok: !!kw && first100.indexOf(kwLower)!==-1},
+    {label:'Focus keyword in at least one H2', ok: hasH2WithKw},
+    {label:'Keyword density 0.5%–2.5% (no stuffing)', ok: density>=0.5 && density<=2.5},
+    {label:'2+ secondary/LSI keywords used', ok: secondaryHits.length>=2 || (secondary.length>0 && secondaryHits.length===secondary.length && secondary.length>=1)},
+    {label:'Substantive content (300+ words; Google sets no word target)', ok: wc>=300},
+    {label:'3+ H2 sections', ok: sectionCount>=3},
+    {label:'Readability: Flesch score 50+', ok: fre>=50},
+    {label:'Featured image + alt text set', ok: !!(af('imgUrl').value||'').trim() && !!(af('imgAlt').value||'').trim()},
+    {label:'1+ internal/related link', ok: internalLinks>=1},
+    {label:'Slug 60 characters or fewer', ok: slug.length>0 && slug.length<=60},
+    {label:'Byline: author name + author URL', ok: !!(af('authorName').value||'').trim() && /^https?:\/\//.test((af('authorUrl').value||'').trim())},
+    {label:'Sources cited', ok: (af('sources').value||'').split('\n').filter(function(l){return /https?:\/\//.test(l);}).length>=1},
+    {label:'Key takeaways summary (3+ lines)', ok: (af('takeaways').value||'').split('\n').filter(function(l){return l.trim();}).length>=3}
+  ];
+  var eduBox=document.getElementById('art_eduEnabled');
+  if(eduBox && eduBox.checked){
+    checks.push({label:'Flashcards: 2+ complete pairs + topic set', ok: validFlashcards().length>=2 && !!(af('eduTopic').value||'').trim()});
+  }
+  var score=Math.round(checks.filter(function(c){return c.ok;}).length/checks.length*100);
+  var color=score>=80?'#1F9D55':score>=50?'#C98A00':'#E5484D';
+  document.getElementById('art_gauge').style.background='conic-gradient('+color+' '+(score*3.6)+'deg, #E3E8EF 0deg)';
+  document.getElementById('art_gaugeScore').textContent=score;
+  document.getElementById('art_seoChecklist').innerHTML=checks.map(function(c){
+    return '<li><span class="tick '+(c.ok?'ok':'bad')+'">'+(c.ok?'✓':'')+'</span>'+c.label+'</li>';
+  }).join('');
+}
+
+function localDT(){return new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);}
+function isoLocal(d){
+  var p=function(n){return ('0'+n).slice(-2);}, o=-d.getTimezoneOffset(), sg=o>=0?'+':'-'; o=Math.abs(o);
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+sg+p(Math.floor(o/60))+':'+p(o%60);
+}
+function isUrl(u){return /^https?:\/\/[^\s\/]+\.[^\s]+$/i.test(u);}
+/* Blogger/Google-hosted images accept size params, so one URL yields all three ratios Google recommends. */
+function bloggerCrops(u){
+  if(!/(googleusercontent\.com|bp\.blogspot\.com)/i.test(u)) return [u];
+  var sizes=['w1200-h1200-c','w1200-h900-c','w1200-h675-c'], pathRe=/\/(s\d+|w\d+-h\d+)(-[a-z]+)*\/([^\/]+)$/i, qRe=/=(s\d+|w\d+-h\d+)(-[a-z]+)*$/i;
+  if(pathRe.test(u)) return sizes.map(function(z){return u.replace(pathRe,'/'+z+'/$3');});
+  if(qRe.test(u)) return sizes.map(function(z){return u.replace(qRe,'='+z);});
+  return [u];
+}
+function fmtBody(t){
+  return scrub(t).split(/\n{2,}/).filter(Boolean).map(function(b){
+    var L=b.split('\n');
+    if(L.every(function(l){return /^\s*[-•*]\s+/.test(l);})) return '<ul>'+L.map(function(l){return '<li>'+l.replace(/^\s*[-•*]\s+/,'')+'</li>';}).join('')+'</ul>';
+    return '<p>'+L.join('<br>')+'</p>';
+  }).join('\n');
+}
+function showLint(items){
+  document.getElementById('art_lint').innerHTML=items.map(function(i){
+    return '<li><span class="tick '+(i.ok?'ok':'bad')+'"'+(i.ok?'':' style="background:#E5484D"')+'>'+(i.ok?'✓':'!')+'</span>'+esc(i.t)+'</li>';
+  }).join('');
+}
+function validateArticle(){
+  var ok=true, errs=[];
+  document.querySelectorAll('#panel-article .error').forEach(function(e){e.textContent='';});
+  ['title','focusKeyword','intro','datePosted'].forEach(function(field){
+    var el=af(field);
+    if(!el.value.trim()){var s=document.getElementById('art_'+field+'Err');if(s)s.textContent='This field is required';ok=false;}
+  });
+  [['authorUrl','Author URL'],['pubUrl','Site URL'],['pubLogo','Publisher logo URL'],['postUrl','Blogger post URL'],['imgUrl','Featured image URL']].forEach(function(r){
+    var v=af(r[0]).value.trim(); if(v && !isUrl(v)){errs.push(r[1]+' must be a full http(s) URL.');ok=false;}
+  });
+  var m=af('dateModified').value, d=af('datePosted').value;
+  if(m && d && new Date(m)<new Date(d)){errs.push('Date Modified cannot be earlier than Date Published.');ok=false;}
+  if(document.getElementById('art_eduEnabled').checked){
+    if(validFlashcards().length<2){errs.push('Flashcards are switched on but fewer than 2 complete pairs exist.');ok=false;}
+    if(!af('eduTopic').value.trim()){errs.push('Flashcards are switched on: fill in the Topic / Concept field.');ok=false;}
+  }
+  if(errs.length) showLint(errs.map(function(t){return {ok:false,t:t};}));
+  return ok;
+}
+
+function buildArticle(){
+  var title=af('title').value.trim(), kw=af('focusKeyword').value.trim(), meta=scrub(af('metaDesc').value.trim()),
+      imgUrl=af('imgUrl').value.trim(), imgAlt=af('imgAlt').value.trim()||title,
+      aType=af('authorType').value||'Person', aName=af('authorName').value.trim().replace(/^(posted|written)?\s*by\s+/i,''),
+      aUrl=af('authorUrl').value.trim(), aBio=scrub(af('authorBio').value),
+      pName=af('pubName').value.trim(), pUrl=af('pubUrl').value.trim(), pLogo=af('pubLogo').value.trim(),
+      postUrl=af('postUrl').value.trim(), cat=af('category').value.trim(),
+      sec=af('secondary').value.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  var pub=new Date(af('datePosted').value), mod=af('dateModified').value?new Date(af('dateModified').value):pub;
+  var pubIso=isoLocal(pub), modIso=isoLocal(mod), edited=(mod-pub)>=6e4;
+  var secs=articleSections.filter(function(x){return x.h.trim();});
+  var cards=validFlashcards(), eduOn=document.getElementById('art_eduEnabled').checked, eduTopic=af('eduTopic').value.trim();
+  var eduReady=eduOn && cards.length>=2 && eduTopic;
+  var imgs=imgUrl?(af('imgAuto').checked?bloggerCrops(imgUrl):[imgUrl]):[];
+  var words=wordCount(articleFullText());
+  var SO='\x3Cscript type="application/ld+json"\x3E', SC='\x3C/script\x3E';
+  var ld=function(o){return SO+'\n'+JSON.stringify(o,null,2).replace(/</g,'\\u003c')+'\n'+SC;};
+
+  /* ---- BlogPosting: every property is one Google lists as recommended, or standard schema.org ---- */
+  var schema={'@context':'https://schema.org','@type':'BlogPosting'};
+  if(postUrl){schema['@id']=postUrl+'#article';schema.mainEntityOfPage={'@type':'WebPage','@id':postUrl};schema.url=postUrl;}
+  schema.headline=title.length>110?title.slice(0,110).replace(/\s+\S*$/,''):title;
+  if(meta) schema.description=meta;
+  if(imgs.length) schema.image=imgs;
+  schema.datePublished=pubIso; schema.dateModified=modIso;
+  if(aName){var au={'@type':aType,'name':aName}; if(aUrl) au.url=aUrl; schema.author=[au];}
+  if(pName){var pb={'@type':'Organization','name':pName}; if(pUrl) pb.url=pUrl; if(pLogo) pb.logo={'@type':'ImageObject','url':pLogo}; schema.publisher=pb;}
+  schema.inLanguage='en-ZA';
+  schema.keywords=[kw].concat(sec).join(', ');
+  if(cat) schema.articleSection=cat.split(',')[0].trim();
+  schema.wordCount=words;
+  schema.isAccessibleForFree=true;
+  var jsonLd=ld(schema), quizLd='';
+
+  var fc='';
+  if(eduReady){
+    var quiz={'@context':'https://schema.org/','@type':'Quiz','about':{'@type':'Thing','name':eduTopic},
+      'hasPart':cards.map(function(c){return {'@type':'Question','eduQuestionType':'Flashcard','text':c.q.trim(),'acceptedAnswer':{'@type':'Answer','text':c.a.trim()}};})};
+    var al=[], es=af('eduSubject').value.trim(), el=af('eduLevel').value.trim();
+    if(es) al.push({'@type':'AlignmentObject','alignmentType':'educationalSubject','targetName':es});
+    if(el) al.push({'@type':'AlignmentObject','alignmentType':'educationalLevel','targetName':el});
+    if(al.length) quiz.educationalAlignment=al;
+    quizLd='\n\n'+ld(quiz);
+    fc='<div class="oc-fc" id="oc-flashcards"><h2>Quick Revision: '+esc(eduTopic)+' Flashcards</h2>'+cards.map(function(c){
+      return '<details><summary>'+esc(c.q.trim())+'</summary><p>'+esc(c.a.trim())+'</p></details>';}).join('')+'</div>';
+  }
+
+  /* ---- Visible content: byline + dates match the markup (Google byline-date guidance) ---- */
+  var D=function(v){return fmtDate(v).split(' at ')[0];};
+  var by=aName?'By '+(aUrl?'<a href="'+esc(aUrl)+'" rel="author">'+esc(aName)+'</a>':esc(aName))+' · ':'';
+  var byline='<p class="oc-by">'+by+'Published <time datetime="'+pubIso+'">'+D(af('datePosted').value)+'</time>'+
+    (edited?' · Updated <time datetime="'+modIso+'">'+D(af('dateModified').value)+'</time>':'')+'</p>';
+  var lede=meta?'<p class="oc-lede">'+esc(meta)+'</p>':'';
+  var img=imgs.length?'<figure><img src="'+esc(imgs[imgs.length-1])+'" alt="'+esc(imgAlt)+'"'+(imgs.length>1?' width="1200" height="675"':'')+' fetchpriority="high" decoding="async"/></figure>':'';
+  var tk=af('takeaways').value.split('\n').map(function(x){return x.trim();}).filter(Boolean);
+  var take=tk.length?'<div class="oc-box"><strong>Key takeaways</strong><ul>'+tk.map(function(x){return '<li>'+esc(scrub(x))+'</li>';}).join('')+'</ul></div>':'';
+  var toc=secs.length>=3?'<nav class="oc-toc" aria-label="Table of contents"><strong>In this article</strong><ol>'+secs.map(function(x,i){return '<li><a href="#oc-s'+i+'">'+esc(scrub(x.h))+'</a></li>';}).join('')+(eduReady?'<li><a href="#oc-flashcards">Quick revision flashcards</a></li>':'')+'</ol></nav>':'';
+  var body=fmtBody(af('intro').value)+'\n'+secs.map(function(x,i){return '<h2 id="oc-s'+i+'">'+esc(scrub(x.h))+'</h2>\n'+fmtBody(x.c);}).join('\n');
+  var concl=scrub(af('conclusion').value), end=concl?'<h2>Final thoughts</h2>\n'+fmtBody(concl):'';
+  var srcRows=af('sources').value.split('\n').map(function(l){var q=l.split('|');return {n:(q[0]||'').trim(),u:(q[1]||'').trim()};}).filter(function(r){return r.n;});
+  var srcHtml=srcRows.length?'<h2>Sources and further reading</h2>\n<ol>'+srcRows.map(function(r){return '<li>'+(isUrl(r.u)?'<a href="'+esc(r.u)+'" rel="noopener">'+esc(r.n)+'</a>':esc(r.n))+'</li>';}).join('')+'</ol>':'';
+  var related=articleLinks.filter(function(r){return r.name.trim()&&isUrl(r.url.trim());});
+  var relHtml=related.length?'<h2>Related reading</h2>\n<ul>'+related.map(function(r){return '<li><a href="'+esc(r.url.trim())+'">'+esc(r.name.trim())+'</a></li>';}).join('')+'</ul>':'';
+  var box=aName&&aBio?'<div class="oc-author"><strong>About the author</strong><p>'+esc(aName)+': '+esc(aBio)+'</p></div>':'';
+  var ai=af('aiDisclosure').checked?'<p class="oc-note">This article was drafted with AI assistance and then reviewed and edited by '+esc(aName||'the author')+' before publishing.</p>':'';
+
+  var css=['.oc-article{max-width:760px;margin:0 auto;line-height:1.75;font-size:17px}','.oc-article h2{margin:2em 0 .5em;line-height:1.3;scroll-margin-top:80px}',
+    '.oc-by{font-size:14px;opacity:.75;margin:0 0 1em}','.oc-lede{font-size:19px;line-height:1.6;margin:0 0 1.2em}',
+    '.oc-article figure{margin:1.5em 0}.oc-article figure img{max-width:100%;height:auto;border-radius:10px}',
+    '.oc-box,.oc-toc,.oc-author{border:1px solid rgba(128,128,128,.3);border-left:4px solid #FF6B35;border-radius:8px;padding:14px 18px;margin:1.5em 0}',
+    '.oc-box ul,.oc-toc ol{margin:.5em 0 0;padding-left:1.2em}','.oc-note{font-size:13px;opacity:.7;margin-top:2em}',
+    '.oc-fc details{border:1px solid rgba(128,128,128,.3);border-radius:8px;padding:10px 14px;margin:8px 0}.oc-fc summary{cursor:pointer;font-weight:600}'].join('\n');
+
+  /* Text first, then <style> and structured data last, so Blogger snippets and auto-slugs never start with code. */
+  var out='<div class="oc-article">\n'+lede+'\n'+byline+'\n'+img+'\n'+take+'\n'+toc+'\n'+body+'\n'+(eduReady?fc+'\n':'')+end+'\n'+srcHtml+'\n'+relHtml+'\n'+box+'\n'+ai+'\n</div>\n\n<style>\n'+css+'\n</style>\n\n'+jsonLd+quizLd;
+  out=out.replace(/\n{3,}/g,'\n\n');
+  af('outPost').value=out;
+
+  var slug=(af('slug').value||title.toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-'));
+  if(slug.length>60) slug=slug.slice(0,60).replace(/-[^-]*$/,'');
+  af('outSettings').value='TITLE BOX: '+title+'\nPERMALINK (Post settings > Permalink > Custom URL, set BEFORE publishing): '+slug+'\nSEARCH DESCRIPTION (Post settings, max 150; enable in Settings > Meta tags): '+meta+'\nLABELS: '+cat+'\nFIRST IMAGE: Blogger uses the first image in the post for social/Discover previews, keep the featured image first.';
+
+  /* ---- Self-check of the generated markup ---- */
+  var parsed=null, m=out.match(/<script type="application\/ld\+json">\n([\s\S]*?)\n<\/script>/);
+  try{parsed=JSON.parse(m[1]);}catch(e){}
+  var iso=/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/;
+  showLint([
+    {ok:!!parsed,t:'JSON-LD is valid JSON and parses'},
+    {ok:!!parsed&&parsed['@type']==='BlogPosting',t:'Type is BlogPosting (accepted by Google as an Article type)'},
+    {ok:schema.headline.length>0&&schema.headline.length<=110,t:'Headline present and concise ('+schema.headline.length+' chars)'},
+    {ok:iso.test(pubIso)&&iso.test(modIso)&&mod>=pub,t:'datePublished / dateModified are ISO 8601 with timezone, modified is not before published'},
+    {ok:!!schema.author&&!!(schema.author[0].url),t:'author has @type, name and url (Google author best practice)'},
+    {ok:imgs.length>=3,t:imgs.length>=3?'Three image ratios supplied (1:1, 4:3, 16:9)':'Add a Blogger-hosted image URL for the three recommended ratios (a single image still works)'},
+    {ok:!!schema.mainEntityOfPage,t:schema.mainEntityOfPage?'@id and mainEntityOfPage set':'After first publish, paste the post URL and regenerate to add @id and mainEntityOfPage'},
+    {ok:!!schema.publisher&&!!schema.publisher.logo,t:'Publisher name and logo set'},
+    {ok:!edited,t:edited?'Updated date is shown: keep it only if the content changed substantially (Google warns against fake freshness)':'Modified date equals publish date, no fake-freshness risk'}
+  ]);
+  var bx=af('outSettings'); if(bx&&bx.scrollIntoView) af('outPost').scrollIntoView({behavior:'smooth'});
+}
+
+function buildHeadSnippet(){
+  var o=document.getElementById('outHead'); if(!o) return;
+  o.value="<b:if cond='data:view.isPost'>\n  <meta content='max-image-preview:large' name='robots'/>\n</b:if>";
+  var j=document.getElementById('outJobHead'); if(!j) return;
+  j.value=[
+    "<b:if cond='data:view.isPost'>",
+    "  <meta content='summary_large_image' name='twitter:card'/>",
+    "  <meta expr:content='data:blog.pageName' name='twitter:title'/>",
+    "  <b:if cond='data:blog.metaDescription != &quot;&quot;'>",
+    "    <meta expr:content='data:blog.metaDescription' name='twitter:description'/>",
+    "  </b:if>",
+    "  <b:if cond='data:blog.postImageUrl'>",
+    "    <meta expr:content='data:blog.postImageUrl' name='twitter:image'/>",
+    "  </b:if>",
+    "</b:if>"
+  ].join('\n');
+}
+
+function goArticle(){
+  if(validateArticle()){buildArticle();updateArticleSeo();return true;}
+  return false;
+}
+
+async function publishArticleToBlogger(){
+  if(!accessToken || Date.now()>tokenExpiry){setBloggerStatus('err','Not connected — click Connect to Blogger first');logPublish('Article: not connected.');return;}
+  if(!af('outPost').value.trim()){
+    var okGen=goArticle();
+    if(!okGen){logPublish('Article: fix the highlighted fields, then try again.');return;}
+  }
+  var blogId=document.getElementById('blogId').value.trim();
+  var draft=document.getElementById('saveDraft').checked;
+  var url='https://www.googleapis.com/blogger/v3/blogs/'+encodeURIComponent(blogId)+'/posts'+(draft?'?isDraft=true':'');
+  logPublish('Article: publishing…');
+  try{
+    var res=await fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({title:af('title').value,content:af('outPost').value,labels:af('category').value.split(',').map(function(x){return x.trim();}).filter(Boolean)})});
+    var data=await res.json();
+    if(!res.ok){logPublish('Article: failed — '+(data.error&&data.error.message||res.status));return;}
+    logPublish('Article: '+(draft?'saved as draft ✓':'published ✓')+' — '+(data.url||data.selfLink||'check Blogger dashboard'));
+  }catch(e){
+    logPublish('Article: network error — '+e.message);
+  }
+}
+
+/* ============================================================ INIT ============================================================ */
+
+function initProvinceSelects(){
+  [1,2].forEach(function(idx){
+    var sel = f('province',idx);
+    for(var p in PROVINCE_CITIES){var o=document.createElement('option');o.value=o.textContent=p;sel.appendChild(o);}
+  });
+}
+
+window.onload = function(){
+  document.getElementById('panel-job1').innerHTML = jobFormHTML(1);
+  document.getElementById('panel-job2').innerHTML = jobFormHTML(2);
+  initProvinceSelects();
+  [1,2].forEach(function(idx){
+    f('datePosted',idx).value = localDT();
+    f('siteUrl',idx).value = 'https://www.onecareer.co.za';
+    f('pubName',idx).value = 'OneCareer';
+    f('authorName',idx).value = 'OneCareer Editorial Team';
+    updateSeo(idx);
+  });
+  renderOtherJobsEditor();
+  buildGadget();
+
+  document.getElementById('panel-article').innerHTML = articleFormHTML();
+  renderArticleSectionsEditor();
+  renderArticleLinksEditor();
+  renderFlashcardsEditor();
+  af('datePosted').value = localDT();
+  af('pubName').value = 'OneCareer';
+  af('authorName').value = 'OneCareer Editorial Team';
+  af('datePosted').addEventListener('input',function(){this.dataset.dirty='1';});
+  buildHeadSnippet();
+  updateArticleSeo();
+  suggestKeywords();
+};
+setInterval(function(){
+  if(af('datePosted') && !af('datePosted').dataset.dirty) af('datePosted').value=localDT();
+},60000);
+setInterval(function(){[1,2].forEach(function(idx){if(f('closing',idx).value) updateBanner(idx);});},60000);
+
+/* ============================================================ TAB NAV ============================================================ */
+
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelector('.tab-btn[data-tab="'+name+'"]').classList.add('active');
+}
+
+/* ============================================================ HELPERS ============================================================ */
+
+function f(field,idx){return document.getElementById(field+'_'+idx);}
+function ferr(field,idx,msg){var id=field+'_'+idx+'Err';var s=document.getElementById(id);if(s)s.textContent=msg||'';}
+function clearErrs(idx){document.querySelectorAll('#panel-job'+idx+' .error').forEach(function(e){e.textContent='';});}
+
+/* ============================================================ EXPIRY BANNER ============================================================ */
+
+/* South Africa has no DST, so every date typed in this tool is SAST (+02:00). Using a fixed offset keeps validThrough exact whatever timezone the browser is in. */
+function sast(v){ if(!v) return new Date(NaN); return new Date(String(v).length===16 ? v+':00+02:00' : v); }
+function saIso(v){ if(!v) return ''; return String(v).length===16 ? v+':00+02:00' : v; }
+function fmtDay(v){
+  if(!v) return '';
+  var p=String(v).split('-'); if(p.length!==3) return esc(v);
+  var M=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return Number(p[2])+' '+M[Number(p[1])-1]+' '+p[0];
+}
+function expiryInfo(val){
+  if(!val) return null;
+  var ms=sast(val)-new Date(), days=ms/864e5;
+  if(ms<0) return {s:'expired',ms:ms};
+  if(days<=3) return {s:'expiring-soon',ms:ms};
+  return {s:'active',ms:ms};
+}
+function fmtCd(ms){
+  if(ms<=0) return null;
+  var t=Math.floor(ms/1000), d=Math.floor(t/86400), h=Math.floor((t%86400)/3600), m=Math.floor((t%3600)/60);
+  return d>0?'Closes in '+d+'d '+h+'h '+m+'m':h>0?'Closes in '+h+'h '+m+'m':'Closes in '+m+'m';
+}
+function updateBanner(idx){
+  var val=f('closing',idx).value, b=f('expiryBanner',idx), cd=document.getElementById('countdown_'+idx);
+  b.className='';
+  if(!val){cd.textContent='';return;}
+  var i=expiryInfo(val);
+  if(i.s==='expired'){b.className='eb-expired';b.textContent='This job listing has EXPIRED. The generated code will show a Position Closed notice automatically.';cd.textContent='';}
+  else if(i.s==='expiring-soon'){b.className='eb-soon';b.textContent='This listing expires within 3 days.';cd.textContent=fmtCd(i.ms);}
+  else {b.className='eb-active';b.textContent='This job listing is ACTIVE.';cd.textContent=fmtCd(i.ms);}
+}
+
+/* ============================================================ LOCATION ============================================================ */
+
+function updateCityList(idx){
+  var p=f('province',idx).value, dl=document.getElementById('cityList_'+idx);
+  dl.innerHTML='';
+  f('postal',idx).value=''; f('city',idx).value='';
+  document.getElementById('cityPreview_'+idx).innerHTML='';
+  if(p && PROVINCE_CITIES[p]){
+    PROVINCE_CITIES[p].forEach(function(c){var o=document.createElement('option');o.value=c[0];dl.appendChild(o);});
+  }
+  renderCityPicker(idx);
+}
+function updatePostal(idx){
+  var p=f('province',idx).value, c=f('city',idx).value.trim();
+  if(p && PROVINCE_CITIES[p]){
+    var match=PROVINCE_CITIES[p].find(function(row){return row[0].toLowerCase()===c.toLowerCase();});
+    if(match) f('postal',idx).value=match[1];
+  }
+  renderCityPicker(idx);
+}
+function renderCityPicker(idx){
+  var p=f('province',idx).value, wrap=document.getElementById('cityPicker_'+idx), multi=document.getElementById('multiLoc_'+idx);
+  if(!multi || !multi.checked || !p || !PROVINCE_CITIES[p]){
+    if(wrap){wrap.style.display='none';wrap.innerHTML='';}
+    renderCityPreview(idx);
+    return;
+  }
+  var c=f('city',idx).value.trim().toLowerCase();
+  wrap.style.display='block';
+  var others=PROVINCE_CITIES[p].filter(function(row){return row[0].toLowerCase()!==c;});
+  wrap.innerHTML='<label>Tick only the towns where this exact vacancy is genuinely also open right now:</label>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+others.map(function(row){
+      return '<label style="display:inline-flex;align-items:center;gap:4px;background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-weight:400;font-size:12px">'+
+        '<input type="checkbox" value="'+row[0]+'" style="width:auto" onchange="renderCityPreview('+idx+')">'+row[0]+'</label>';
+    }).join('')+'</div>';
+  renderCityPreview(idx);
+}
+function otherCities(idx){
+  var multi=document.getElementById('multiLoc_'+idx);
+  if(!multi || !multi.checked) return [];
+  var p=f('province',idx).value, picker=document.getElementById('cityPicker_'+idx);
+  if(!p || !PROVINCE_CITIES[p] || !picker) return [];
+  var checkedNames=Array.from(picker.querySelectorAll('input[type=checkbox]:checked')).map(function(cb){return cb.value;});
+  return PROVINCE_CITIES[p].filter(function(row){return checkedNames.indexOf(row[0])!==-1;});
+}
+function renderCityPreview(idx){
+  var extra=otherCities(idx), box=document.getElementById('cityPreview_'+idx);
+  if(!extra.length){box.innerHTML='';return;}
+  box.innerHTML='<label>Will also be listed as a confirmed jobLocation:</label>'+extra.map(function(c){return '<span class="chip">'+c[0]+'</span>';}).join('');
+}
+
+/* ============================================================ REMOTE WORK ============================================================ */
+
+function toggleRemote(idx){
+  var on=f('remote',idx).checked;
+  document.getElementById('remoteFields_'+idx).style.display = on ? 'block' : 'none';
+  updateSeo(idx);
+}
+
+/* ============================================================ TITLE GENERATOR ============================================================ */
+
+function makeTitle(idx){
+  var t=f('title',idx).value||'Job Position', r=f('jobRef',idx).value||'REF001',
+      n=f('orgName',idx).value||'Company', c=f('city',idx).value||'City',
+      y=new Date().getFullYear(), cat=f('category',idx).value||'Professional',
+      kw=f('focusKeyword',idx).value;
+  var tpls=[
+    t, t+' Jobs at '+n, y+' '+cat+' Job Opportunities - '+t,
+    n+' Vacancies '+y+' | '+t, y+' '+n+' Vacancies | '+cat+' Job',
+    t+' Jobs - '+n+' Vacancies Apply Online', n+' Vacancies '+y+' - Online Applications',
+    y+' '+cat+' Vacancies | '+t+' in '+c, n+' Job Opportunities | '+t+' (Ref: '+r+')',
+    'New '+y+' '+cat+' Jobs: '+t+' at '+n, n+' '+cat+' Vacancies | '+t+' (Ref: '+r+')',
+    t+' Position Available | Latest '+cat+' Jobs', y+' '+cat+' Jobs at '+n,
+    n+' '+y+' Vacancy: '+t+' (Ref: '+r+')',
+    'Apply for '+cat+' Vacancies | '+t+' Role at '+n,
+    n+' Seeks '+t+' for '+cat+' Team', y+' Career Opportunities - '+t+' at '+n
+  ];
+  if(kw) tpls.push(kw+': '+t+' at '+n+' ('+y+')');
+  f('genTitle',idx).value=tpls[Math.floor(Math.random()*tpls.length)];
+  updateSeo(idx);
+}
+
+/* ============================================================ SEO SCORE ============================================================ */
+
+function updateSeo(idx){
+  var titleLen=(f('genTitle',idx).value||f('title',idx).value||'').length;
+  var meta=f('metaDesc',idx).value||'';
+  var mc=document.getElementById('metaDescCount_'+idx);
+  mc.textContent=meta.length+' / 155';
+  mc.style.color = (meta.length>=120&&meta.length<=155) ? '#1F9D55' : (meta.length===0 ? '#5B6675' : '#C98A00');
+
+  var kw=(f('focusKeyword',idx).value||'').toLowerCase().trim();
+  var titleText=(f('genTitle',idx).value||f('title',idx).value||'').toLowerCase();
+  var introText=(f('dIntro',idx).value||'').toLowerCase();
+  var wordCount=(f('dIntro',idx).value+' '+f('dResp',idx).value+' '+f('dQual',idx).value).trim().split(/\s+/).filter(Boolean).length;
+
+  var hasApplyMethod = !!((f('applyUrl',idx).value||'').trim() || (f('dApply',idx).value||'').trim());
+  var titleFlagged = /(\!{2,}|\*{2,}|[A-Z]{10,})/.test((f('genTitle',idx).value||f('title',idx).value||''));
+
+  var checks=[
+    {label:'Title length 40–65 characters', ok: titleLen>=40 && titleLen<=65},
+    {label:'Title avoids ALL CAPS / !!! / *** (spam risk)', ok: !titleFlagged},
+    {label:'Meta description 120–155 characters', ok: meta.length>=120 && meta.length<=155},
+    {label:'No generator scaffolding in any field', ok: !['dIntro','dCompany','dResp','dQual','dBenefits','dApply','metaDesc','genTitle'].some(function(fl){var e=f(fl,idx);return e&&hasScaffold(e.value);})},
+    {label:'Apply link is a real application page (not a homepage)', ok: !isBareHomepage(f('applyUrl',idx).value)},
+    {label:'Focus keyword set', ok: !!kw},
+    {label:'Focus keyword appears in title', ok: !!kw && titleText.indexOf(kw)!==-1},
+    {label:'Focus keyword appears in introduction', ok: !!kw && introText.indexOf(kw)!==-1},
+    {label:'Job image added', ok: !!(f('imgUrl',idx).value||'').trim()},
+    {label:'A real way to apply is provided', ok: hasApplyMethod},
+    {label:'Description is 250+ words', ok: wordCount>=250},
+    {label:'Company website (sameAs) added', ok: !!(f('orgUrl',idx).value||'').trim() || f('anonEmployer',idx).checked},
+    {label:'Education/experience requirement specified', ok: !!f('eduReq',idx).value || !!(f('expMonths',idx).value||'').trim()},
+    {label:'Job benefits/perks listed', ok: !!(f('dBenefits',idx).value||'').trim()},
+    {label:'About the company filled in', ok: !!(f('dCompany',idx).value||'').trim()}
+  ];
+  var score=Math.round(checks.filter(function(c){return c.ok;}).length/checks.length*100);
+
+  var color = score>=80 ? '#1F9D55' : score>=50 ? '#C98A00' : '#E5484D';
+  document.getElementById('gauge_'+idx).style.background = 'conic-gradient('+color+' '+(score*3.6)+'deg, #E3E8EF 0deg)';
+  document.getElementById('gaugeScore_'+idx).textContent = score;
+
+  document.getElementById('seoChecklist_'+idx).innerHTML = checks.map(function(c){
+    return '<li><span class="tick '+(c.ok?'ok':'bad')+'">'+(c.ok?'✓':'')+'</span>'+c.label+'</li>';
+  }).join('');
+}
+
+
+/* ============================================================ OUTPUT HELPERS (added) ============================================================ */
+
+/* Escape text that will land inside an HTML attribute or a table cell. */
+/* JSON-LD serialiser for job posts: valid JSON that can never end the surrounding script block early.
+   A closing script tag or an HTML comment opener inside a value is escaped as unicode; Google decodes it back. */
+function ldStringify(o){
+  return JSON.stringify(o,null,2)
+    .replace(/\x3C\x2F(script)/gi,'\\u003c\\u002f$1')
+    .replace(/\x3C!--/g,'\\u003c!--');
+}
+
+function esc(v){
+  return String(v==null?'':v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* Scaffolding phrases that must never reach a published page. */
+var SCAFFOLD_PATTERNS = [
+  /"@?[A-Za-z_]+"\s*:\s*"[^"]*"\s*,?/g,
+  /^\s*[\{\[][\s\S]{0,400}?[\}\]]\s*/,
+  /generated\s*seo\s*title\s*:?/ig,
+  /\bseo\s*title\s*:?/ig,
+  /\bmeta\s*description\s*:?/ig,
+  /\bfocus\s*(seo\s*)?keyword\s*:?/ig,
+  /\bpost\s*heading\s*:?/ig,
+  /\bslug\s*:?/ig,
+  /\bprompt\s*:?/ig,
+  /\boutput\s*:?/ig,
+  /\bgenerated\s*(by|with)\s*(ai|chatgpt|claude|gemini)\b/ig,
+  /\bas\s+an\s+ai\s+language\s+model\b/ig,
+  /\bhere\s+is\s+(the|your)\s+(rewritten|generated|seo)\b/ig,
+  /"@context"\s*:?/ig,
+  /\bschema\.org\b/ig,
+  /\bjson-?ld\b/ig
+];
+
+/* Strip scaffolding from a block of body text and tidy the leftover spacing. */
+function scrub(t){
+  var out = String(t==null?'':t);
+  SCAFFOLD_PATTERNS.forEach(function(re){ out = out.replace(re,''); });
+  return out
+    .replace(/[ \t]{2,}/g,' ')
+    .replace(/[ \t]+\n/g,'\n')
+    .replace(/\n{3,}/g,'\n\n')
+    .replace(/^[\s"',:;\{\}\[\]]+/,'').replace(/^[–—]+\s*/,'')
+    .replace(/[\s"',:;]+$/,'')
+    .trim();
+}
+
+/* Does this text still contain scaffolding? Used by validation. */
+function hasScaffold(t){
+  var v = String(t==null?'':t);
+  for(var i=0;i<SCAFFOLD_PATTERNS.length;i++){
+    SCAFFOLD_PATTERNS[i].lastIndex = 0;
+    if(SCAFFOLD_PATTERNS[i].test(v)) return true;
+  }
+  return false;
+}
+
+/* 320147 -> "320 147" */
+function fmtNum(n){
+  var v = String(n==null?'':n).replace(/[^0-9.\-]/g,'');
+  if(v==='' || isNaN(Number(v))) return esc(n);
+  var parts = Number(v).toFixed(0).split('');
+  var outp = '', c = 0;
+  for(var i=parts.length-1;i>=0;i--){ outp = parts[i] + (c && c%3===0 ? ' ' : '') + outp; c++; }
+  return outp;
+}
+
+function fmtMoney(min,max,unit){
+  var u = {YEAR:'per year',MONTH:'per month',WEEK:'per week',DAY:'per day',HOUR:'per hour'}[unit] || ('per '+String(unit).toLowerCase());
+  if(!min && !max) return 'Not disclosed';
+  if(!min || !max) return 'R' + fmtNum(min||max) + ' ' + u;
+  if(min && max && String(min)===String(max)) return 'R' + fmtNum(min) + ' ' + u;
+  return 'R' + fmtNum(min) + ' – R' + fmtNum(max) + ' ' + u;
+}
+
+/* "2026-09-15T18:25" -> "15 September 2026 at 18:25" */
+function fmtDate(v){
+  if(!v) return '';
+  var d = new Date(v);
+  if(isNaN(d)) return esc(v);
+  var M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var hh = ('0'+d.getHours()).slice(-2), mm = ('0'+d.getMinutes()).slice(-2);
+  return d.getDate() + ' ' + M[d.getMonth()] + ' ' + d.getFullYear() + ' at ' + hh + ':' + mm;
+}
+
+function fmtExp(months){
+  var m = Number(months);
+  if(!isFinite(m) || m <= 0) return 'No prior experience required';
+  if(m < 12) return m + ' month' + (m===1?'':'s');
+  var y = m / 12;
+  var ys = (Math.round(y*10)/10);
+  return ys + ' year' + (ys===1?'':'s') + (m % 12 ? ' (' + m + ' months)' : '');
+}
+
+var EDU_LABEL = {
+  'no requirements':'No formal qualification required',
+  'high school':'Grade 12 / Matric',
+  'associate degree':'Diploma / Associate degree',
+  'bachelor degree':"Bachelor's degree",
+  'professional certificate':'Professional certificate',
+  'postgraduate degree':'Postgraduate degree'
+};
+
+/* Reference numbers contain slashes and spaces; DOM ids should not. */
+function slugId(v){
+  return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'post';
+}
+
+/* A bare domain root is not an application link. */
+function isBareHomepage(u){
+  var v = String(u||'').trim();
+  if(!v) return false;
+  return /^https?:\/\/[^\/?#]+\/?(?:[?#].*)?$/i.test(v);
+}
+
+var GENERIC_ORG = ['government','gov','department','company','employer','n/a','na','none','various','tbc'];
+
+/* ============================================================ VALIDATION ============================================================ */
+
+function validate(idx){
+  var ok=true;
+  var isRemote=f('remote',idx).checked;
+  var req=['jobRef','title','datePosted','closing','empType','orgName','siteUrl','dIntro','dResp','dQual'];
+  if(!isRemote) req=req.concat(['city','province','postal','country']);
+  req.forEach(function(field){
+    var el=f(field,idx);
+    var val = el.multiple ? el.selectedOptions.length : el.value.trim();
+    if(!val){ferr(field,idx,'This field is required');ok=false;}
+  });
+  if(isRemote && !f('applicantLoc',idx).value.trim()){
+    ferr('applicantLoc',idx,'Required for remote jobs — list at least one country');ok=false;
+  }
+  if(!f('applyUrl',idx).value.trim() && !f('dApply',idx).value.trim()){
+    ferr('applyUrl',idx,'Google requires a real way to apply — add a link here or fill in "How to Apply" above');ok=false;
+  }
+  if(ok){
+    if(parseFloat(f('salMin',idx).value)>parseFloat(f('salMax',idx).value)){
+      ferr('salMin',idx,'Min cannot exceed max');ferr('salMax',idx,'Max cannot be less than min');ok=false;
+    }
+    if(sast(f('datePosted',idx).value)>sast(f('closing',idx).value)){
+      ferr('datePosted',idx,'Posted date cannot be after closing date');
+      ferr('closing',idx,'Closing date cannot be before posted date');ok=false;
+    }
+    if(f('multiLoc',idx).checked && otherCities(idx).length===0){
+      ferr('city',idx,'Tick at least one confirmed extra town, or untick "multiple confirmed openings" above');ok=false;
+    }
+  }
+
+  /* ---- added guards ---- */
+
+  /* Extra locations require an explicit, separate confirmation. */
+  var mlConfirm=f('multiLocConfirm',idx);
+  if(f('multiLoc',idx).checked && mlConfirm && !mlConfirm.checked){
+    ferr('multiLocConfirm',idx,'You must confirm the source advert names every town you ticked. If it does not, untick the multiple-locations box.');ok=false;
+  }
+
+  /* Generation scaffolding must never reach a published page. */
+  ['dIntro','dCompany','dResp','dQual','dBenefits','dApply','metaDesc','genTitle'].forEach(function(field){
+    var el=f(field,idx);
+    if(el && hasScaffold(el.value)){
+      ferr(field,idx,'This field still contains generator scaffolding (e.g. "Generated SEO Title:"). Remove it — it must never appear on a live page.');ok=false;
+    }
+  });
+
+  /* A stub meta description reads as thin content. */
+  var md=f('metaDesc',idx).value.trim();
+  if(md && md.length<70){
+    ferr('metaDesc',idx,'Too short ('+md.length+' characters). Write a full 120–155 character summary, or leave it blank.');ok=false;
+  }
+
+  /* A bare domain root is a dead-end, not an application link. */
+  if(isBareHomepage(f('applyUrl',idx).value)){
+    ferr('applyUrl',idx,'This is a website homepage, not an application page. Link the actual application form or PDF, or clear this field and use "How to Apply" instead.');ok=false;
+  }
+
+  /* A placeholder employer name produces meaningless structured data. */
+  var on=f('orgName',idx).value.trim().toLowerCase();
+  if(on && GENERIC_ORG.indexOf(on)!==-1){
+    ferr('orgName',idx,'Use the actual department or employer name (e.g. "Department of Agriculture"), not a generic word.');ok=false;
+  }
+
+  /* Google requires a closing date in the future at publish time. */
+  if(f('closing',idx).value && sast(f('closing',idx).value) < new Date()){
+    ferr('closing',idx,'This closing date has already passed. Do not publish expired vacancies.');ok=false;
+  }
+
+  /* ---- OneCareer / Google Jobs guards ---- */
+  [['siteUrl','Site URL'],['sourceUrl','Source URL'],['orgLogo','Logo URL']].forEach(function(r){
+    var v=(f(r[0],idx).value||'').trim();
+    if(v && !isUrl(v)){ferr(r[0],idx,r[1]+' must be a full http(s) URL.');ok=false;}
+  });
+  var em=(f('applyEmail',idx).value||'').trim();
+  if(em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ferr('applyEmail',idx,'Enter a valid email address.');ok=false;}
+  if(f('datePosted',idx).value && sast(f('datePosted',idx).value) > new Date(Date.now()+864e5)){
+    ferr('datePosted',idx,'Date posted is in the future. Google ignores or rejects future posting dates.');ok=false;
+  }
+  if(f('directApply',idx).checked && !(f('applyUrl',idx).value||'').trim() && !em){
+    ferr('applyUrl',idx,'Direct Apply is ticked but there is no apply link or application email. Untick it, or add a real apply path.');ok=false;
+  }
+  if(ok){
+    var smn=parseFloat(f('salMin',idx).value), smx=parseFloat(f('salMax',idx).value), top=Math.max(smn||0,smx||0);
+    if(top>0 && f('salUnit',idx).value==='YEAR' && top<30000 &&
+       !confirm('The salary is R'+top+' with unit PER YEAR. That is very low for an annual figure. Internship and stipend amounts are usually PER MONTH.\n\nPress OK only if the advert really says per year. Press Cancel to fix it.')){
+      ferr('salUnit',idx,'Check the unit against the advert.');ferr('salMin',idx,'Salary looks like a monthly figure.');ok=false;
+    }
+    var types=Array.from(f('empType',idx).selectedOptions).map(function(o){return o.value;});
+    var tt=(f('title',idx).value+' '+f('genTitle',idx).value);
+    if(ok && /\b(intern|internship|learnership|work integrated|wil|apprentice|apprenticeship|trainee|graduate programme|graduate program|bursary)\b/i.test(tt) && types.indexOf('INTERN')===-1 &&
+       !confirm('This title looks like an internship, learnership or WIL post, but Employment Type does not include Intern. Google will show the type you chose (for example Full-time) in the listing.\n\nPress OK to keep it as is, or Cancel to change it.')){
+      ferr('empType',idx,'Consider selecting Intern (or Temporary).');ok=false;
+    }
+  }
+
+  return ok;
+}
+
+/* ============================================================ DESCRIPTION SECTIONS ============================================================ */
+
+function sections(idx,fmt){
+  var defs=[
+    {t:'Introduction',id:'dIntro',req:true},
+    {t:'About the Company',id:'dCompany',req:false},
+    {t:'Responsibilities',id:'dResp',req:true},
+    {t:'Required Qualifications',id:'dQual',req:true},
+    {t:'Job Benefits and Perks',id:'dBenefits',req:false},
+    {t:'How to Apply',id:'dApply',req:false}
+  ];
+  var out='';
+  defs.forEach(function(d){
+    var c=scrub(f(d.id,idx).value);
+    if(d.id==='dApply'){
+      var em=(f('applyEmail',idx).value||'').trim();
+      if(em) c=(c?c+'\n\n':'')+'Send your application by email to: '+em;
+    }
+    if(!d.req && !c) return;
+    if(fmt==='plain') out+=d.t+'\n\n'+c+'\n\n';
+    else if(fmt==='schema') out+='<h3>'+d.t+'</h3>'+bodyHtml(c);
+    else out+='<h3 style="color:#333;margin-top:24px;">'+d.t+'</h3>\n<p style="line-height:1.7;">'+c.replace(/\n/g,'<br>')+'</p>\n';
+  });
+  return out.trim();
+}
+
+/* ============================================================ OTHER JOBS TABLE (SHARED) ============================================================ */
+
+function renderOtherJobsEditor(){
+  var tbl=document.getElementById('otherJobsEditor');
+  var html='<tr><td style="font-weight:600;font-size:12px;color:var(--muted)">Job Name</td><td style="font-weight:600;font-size:12px;color:var(--muted)">Apply Link (URL)</td><td></td></tr>';
+  otherJobs.forEach(function(row,i){
+    html+='<tr>'+
+      '<td><input type="text" value="'+row.name.replace(/"/g,'&quot;')+'" placeholder="e.g., Retail Assistant - Cape Town" oninput="otherJobs['+i+'].name=this.value"></td>'+
+      '<td><input type="url" value="'+row.url.replace(/"/g,'&quot;')+'" placeholder="https://…" oninput="otherJobs['+i+'].url=this.value"></td>'+
+      '<td><button class="small-x" onclick="removeOtherJobRow('+i+')" title="Remove">✕</button></td>'+
+      '</tr>';
+  });
+  tbl.innerHTML=html;
+}
+function addOtherJobRow(){otherJobs.push({name:'',url:''});renderOtherJobsEditor();}
+function removeOtherJobRow(i){otherJobs.splice(i,1);renderOtherJobsEditor();}
+
+function otherJobsTableHTML(){
+  var rows=otherJobs.filter(function(r){return r.name.trim() && r.url.trim();});
+  if(!rows.length) return '';
+  var tbl='<h2 style="color:#333;margin-top:28px;">Other Jobs To Apply</h2>\n'+
+    '<table style="width:100%;border-collapse:collapse;margin:16px 0;font-family:Arial,sans-serif;">\n';
+  rows.forEach(function(r){
+    tbl+='  <tr>\n'+
+      '    <td style="padding:12px;border:1px solid #ddd;">'+esc(r.name)+'</td>\n'+
+      '    <td style="padding:12px;border:1px solid #ddd;text-align:center;">'+
+        '<a href="'+esc(r.url)+'" style="display:inline-block;background:#FF7A00;color:#fff;padding:8px 18px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:13px;">View job</a></td>\n'+
+      '  </tr>\n';
+  });
+  tbl+='</table>';
+  return tbl;
+}
+
+/* ============================================================ MAIN POST BUILDER ============================================================ */
+
+/* ---------- OneCareer helpers ---------- */
+
+/* Escaped, Google-safe HTML for the schema description (only p, ul, li, br, h3 are used). */
+function bodyHtml(t){
+  var BUL=/^\s*[-•*]\s+/;
+  return scrub(t).split(/\n{2,}/).filter(Boolean).map(function(b){
+    var L=b.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    if(!L.length) return '';
+    if(L.every(function(l){return BUL.test(l);})) return '<ul>'+L.map(function(l){return '<li>'+esc(l.replace(BUL,''))+'</li>';}).join('')+'</ul>';
+    return '<p>'+L.map(esc).join('<br>')+'</p>';
+  }).join('');
+}
+function stripTags(h){return String(h||'').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim();}
+function trimSlash(u){return String(u||'').trim().replace(/\/+$/,'');}
+function labelUrl(site,label){return trimSlash(site)+'/search/label/'+encodeURIComponent(label);}
+
+/* Labels double as the hub pages: province, employer, category. */
+function jobLabels(idx){
+  var out=[], anon=f('anonEmployer',idx).checked;
+  var prov=f('province',idx).value.trim();
+  var dept=(f('deptLabel',idx).value||'').trim() || (anon?'':f('orgName',idx).value.trim());
+  var cat=f('category',idx).value.trim();
+  [prov,dept,cat].forEach(function(l){ if(l && out.indexOf(l)===-1) out.push(l); });
+  return out;
+}
+function jobSlug(idx){
+  var parts=[f('title',idx).value, f('province',idx).value, f('jobRef',idx).value];
+  return parts.join(' ').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,90).replace(/-+$/,'');
+}
+
+function showJobLint(idx,items){
+  document.getElementById('jobLint_'+idx).innerHTML=items.map(function(i){
+    var cls=i.ok?'ok':'bad', st=i.ok?'':(i.warn?' style="background:#C98A00"':' style="background:#E5484D"');
+    return '<li><span class="tick '+cls+'"'+st+'>'+(i.ok?'✓':(i.warn?'~':'!'))+'</span>'+esc(i.t)+'</li>';
+  }).join('');
+}
+
+/* Checks the markup that was ACTUALLY generated, against Google's JobPosting requirements. */
+function jobLint(idx,schema,ctx){
+  var items=[], A=function(ok,t,warn){items.push({ok:!!ok,t:t,warn:!!warn&&!ok});};
+  var tz=/(Z|[+-]\d{2}:\d{2})$/;
+  var locOk=false;
+  if(schema.jobLocationType==='TELECOMMUTE') locOk=!!schema.applicantLocationRequirements;
+  else locOk=(schema.jobLocation||[]).length>0 && schema.jobLocation.every(function(p){var a=p.address||{};return a.addressLocality&&a.addressRegion&&a.addressCountry;});
+  var descText=stripTags(schema.description);
+
+  A(schema.title && schema.title.length>=3,'title present');
+  A(!/[|]|\(\s*ref\b|\bapply (now|online|today)\b|\bvacanc(y|ies)\b|\bjobs? (at|in)\b/i.test(schema.title||'') && (schema.title||'').length<=100,'JobPosting title is a plain job title (no company, reference, pipes or promo words)',true);
+  A(descText.length>=200,'description is substantial HTML ('+descText.length+' characters)');
+  A(/^\d{4}-\d{2}-\d{2}/.test(schema.datePosted||'') && tz.test(schema.datePosted||''),'datePosted is full ISO 8601 with timezone');
+  A(tz.test(schema.validThrough||'') && /T\d{2}:\d{2}/.test(schema.validThrough||''),'validThrough has time and timezone offset');
+  A(!(new Date(schema.datePosted).getTime()>Date.now()+6e4),'datePosted is not in the future (Google ignores future-dated listings)',true);
+  A(sast(f('closing',idx).value)>sast(f('datePosted',idx).value),'validThrough is after datePosted');
+  A(schema.hiringOrganization && schema.hiringOrganization.name && GENERIC_ORG.indexOf(schema.hiringOrganization.name.toLowerCase())===-1,'hiringOrganization has a real name');
+  A(locOk,'location complete (locality, region, country) or valid remote setup');
+  A(!!(schema.jobLocation && schema.jobLocation[0] && schema.jobLocation[0].address && schema.jobLocation[0].address.addressLocality) || schema.jobLocationType==='TELECOMMUTE','addressLocality is set (enables searches like jobs in Pretoria)',true);
+  A(schema.employmentType && schema.employmentType.length>0,'employmentType set and shown in the visible table');
+  A(!!schema.baseSalary && typeof schema.baseSalary.value.unitText==='string' && (typeof schema.baseSalary.value.value==='number' || typeof schema.baseSalary.value.minValue==='number'),'baseSalary present with numeric values (enables salary filters)',true);
+  A(!!(schema.hiringOrganization && (schema.hiringOrganization.sameAs||schema.hiringOrganization.url)),'employer sameAs / url present',true);
+  A(!!(schema.hiringOrganization && schema.hiringOrganization.logo),'employer logo present (shows in the listing instead of a letter tile)',true);
+  A(schema.identifier && schema.identifier.value,'identifier (job reference) present');
+  A(typeof schema.directApply==='boolean','directApply is stated');
+  A(ctx.hasApply,'a real way to apply is on the page');
+  A(!!schema.image,'image present (recommended)',true);
+  A(ctx.hasCrumbs,'BreadcrumbList generated (matches the visible breadcrumb)',true);
+  A(!ctx.expired,'listing is open (validThrough is in the future)',true);
+  showJobLint(idx,items);
+}
+
+/* ============================================================ MAIN POST BUILDER ============================================================ */
+
+function buildPost(idx){
+  var jobRef=f('jobRef',idx).value.trim();
+  var origTitle=f('title',idx).value.trim();
+  var genTitle=(f('genTitle',idx).value||origTitle).trim();
+  var cat=f('category',idx).value;
+  var closingV=f('closing',idx).value;
+  var closingI=saIso(closingV);                                  /* e.g. 2026-10-09T23:59:00+02:00 */
+  var postedI=f('datePosted',idx).value?saIso(f('datePosted',idx).value):closingI;
+  var ei=expiryInfo(closingV), expired=!!(ei && ei.s==='expired');
+  var emp=Array.from(f('empType',idx).selectedOptions);
+  var applyUrl=f('applyUrl',idx).value.trim();
+  var applyEmail=(f('applyEmail',idx).value||'').trim();
+  var imgUrl=f('imgUrl',idx).value.trim();
+  var orgLogo=f('orgLogo',idx).value.trim();
+  var orgUrl=f('orgUrl',idx).value.trim();
+  var anonEmployer=f('anonEmployer',idx).checked;
+  var orgName=anonEmployer?'Confidential':(f('orgName',idx).value.trim()||'Undisclosed employer');
+  var isRemote=f('remote',idx).checked;
+  var applicantLoc=f('applicantLoc',idx).value.trim();
+  var directApply=f('directApply',idx).checked;
+  var eduReq=f('eduReq',idx).value;
+  var expMonths=f('expMonths',idx).value.trim();
+  var metaDesc=scrub(f('metaDesc',idx).value.trim());
+  var province=f('province',idx).value;
+  var city=f('city',idx).value.trim();
+  var postal=f('postal',idx).value.trim();
+  var street=(f('streetAddress',idx).value||'').trim();
+  var country=f('country',idx).value;
+  var duration=(f('duration',idx).value||'').trim();
+  var site=trimSlash(f('siteUrl',idx).value);
+  var deptLabel=(f('deptLabel',idx).value||'').trim() || (anonEmployer?'':f('orgName',idx).value.trim());
+  var srcUrl=(f('sourceUrl',idx).value||'').trim();
+  var srcLabel=(f('sourceLabel',idx).value||'').trim();
+  var lastChecked=(f('lastChecked',idx).value||'').trim();
+  var extraCities=otherCities(idx);
+
+  /* ---------- visible fact table (everything marked up must appear here or in the body) ---------- */
+  var rows=[
+    ['Job Title',esc(origTitle)],
+    ['Employer',esc(orgName)],
+    ['Reference Number',esc(jobRef)]
+  ];
+  if(cat) rows.push(['Category',esc(cat)]);
+  rows.push(['Location', isRemote
+      ? 'Remote / work from home ('+esc(applicantLoc||country)+')'+(city?' — with an optional office in '+esc(city)+', '+esc(province):'')
+      : (street?esc(street)+', ':'')+esc(city)+', '+esc(province)+', South Africa']);
+  rows.push(['Employment Type',esc(emp.map(function(o){return o.text;}).join(', '))]);
+  if(duration) rows.push(['Duration',esc(duration)]);
+  rows=rows.concat([
+    ['Date Posted',fmtDate(f('datePosted',idx).value)],
+    ['Closing Date',fmtDate(closingV)],
+    ['Status',expired?'Closed — applications no longer accepted':'Open for applications'],
+    ['Salary',fmtMoney(f('salMin',idx).value,f('salMax',idx).value,f('salUnit',idx).value)]
+  ]);
+  if(eduReq) rows.push(['Minimum Qualification', EDU_LABEL[eduReq] || esc(eduReq)]);
+  if(String(expMonths).trim()!=='') rows.push(['Experience Required', fmtExp(expMonths)]);
+
+  /* ---------- JobPosting ---------- */
+  var descHtml=(metaDesc?'<p>'+esc(metaDesc)+'</p>':'')+
+    (duration?'<p><strong>Duration:</strong> '+esc(duration)+'</p>':'')+
+    sections(idx,'schema');
+
+  var schema={
+    '@context':'https://schema.org/','@type':'JobPosting',
+    'title':origTitle,   /* Google: plain job title only. No company, location, year, ref code or promo words. The SEO headline (genTitle) stays as the post heading and Article headline. */
+    'description':descHtml,
+    'identifier':{'@type':'PropertyValue','name':orgName,'value':jobRef},
+    'datePosted':postedI,
+    'validThrough':closingI,
+    'employmentType':emp.map(function(o){return o.value;}),
+    'hiringOrganization':{'@type':'Organization','name':orgName}
+  };
+  if(!anonEmployer){
+    if(orgUrl){schema.hiringOrganization.sameAs=orgUrl;schema.hiringOrganization.url=orgUrl;}
+    if(orgLogo) schema.hiringOrganization.logo=orgLogo;
+  }
+
+  var sMin=f('salMin',idx).value.trim(), sMax=f('salMax',idx).value.trim();
+  if(sMin||sMax){
+    var qv={'@type':'QuantitativeValue','unitText':f('salUnit',idx).value};
+    if(sMin && sMax && Number(sMin)!==Number(sMax)){qv.minValue=Number(sMin);qv.maxValue=Number(sMax);}
+    else qv.value=Number(sMax||sMin);
+    schema.baseSalary={'@type':'MonetaryAmount','currency':'ZAR','value':qv};
+  }
+  if(imgUrl) schema.image=imgUrl;
+  schema.directApply=directApply;
+  if(eduReq) schema.educationRequirements={'@type':'EducationalOccupationalCredential','credentialCategory':eduReq};
+  if(expMonths) schema.experienceRequirements={'@type':'OccupationalExperienceRequirements','monthsOfExperience':Number(expMonths)};
+
+  function place(locality,withDetail){
+    var a={'@type':'PostalAddress','addressLocality':locality,'addressRegion':province,'addressCountry':country};
+    if(withDetail){
+      if(street) a.streetAddress=street;
+      if(postal) a.postalCode=postal;
+    }
+    return {'@type':'Place','address':a};
+  }
+  if(isRemote){
+    schema.jobLocationType='TELECOMMUTE';
+    schema.applicantLocationRequirements={'@type':'Country','name':applicantLoc||country};
+    if(city) schema.jobLocation=place(city,true);
+  } else {
+    schema.jobLocation=[place(city,true)].concat(extraCities.map(function(c){return place(c[0],false);}));
+  }
+
+  var SC_OPEN='\x3Cscript\x3E', SC_OPEN_LD='\x3Cscript type="application/ld+json"\x3E', SC_CLOSE='\x3C/script\x3E';
+  var jsonLd=SC_OPEN_LD+'\n'+ldStringify(schema)+'\n'+SC_CLOSE;
+
+  /* ---------- BreadcrumbList + matching visible breadcrumb ---------- */
+  var crumbs=[];
+  if(site){
+    crumbs.push(['Home',site+'/']);
+    if(province) crumbs.push([province,labelUrl(site,province)]);
+    if(deptLabel) crumbs.push([deptLabel,labelUrl(site,deptLabel)]);
+  }
+  crumbs.push([origTitle,null]);
+  var crumbLd='', crumbNav='';
+  if(site){
+    var bc={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':crumbs.map(function(c,i){
+      var li={'@type':'ListItem','position':i+1,'name':c[0]};
+      if(c[1]) li.item=c[1];                       /* last item has no URL, per Google's guidance */
+      return li;
+    })};
+    crumbLd=SC_OPEN_LD+'\n'+ldStringify(bc)+'\n'+SC_CLOSE;
+    crumbNav='<nav aria-label="Breadcrumb" style="font-size:13px;color:#666;margin:0 0 14px;">'+crumbs.map(function(c){
+      return c[1]?'<a href="'+esc(c[1])+'" style="color:#0b5ed7;text-decoration:none;">'+esc(c[0])+'</a>':'<span>'+esc(c[0])+'</span>';
+    }).join(' &rsaquo; ')+'</nav>';
+  }
+
+  /* ---------- Article schema (kept from the original tool) ---------- */
+  var authorName=f('authorName',idx).value.trim();
+  var authorUrl=f('authorUrl',idx).value.trim();
+  var pubName=f('pubName',idx).value.trim()||f('orgName',idx).value;
+  var pubLogo=f('pubLogo',idx).value.trim()||orgLogo;
+  var postUrl=f('postUrl',idx).value.trim();
+  var dateModifiedIso=f('dateModified',idx).value?saIso(f('dateModified',idx).value):(lastChecked?lastChecked+'T00:00:00+02:00':postedI);
+  var articleSchema={
+    '@context':'https://schema.org','@type':'Article',
+    'headline':genTitle.length>110?genTitle.slice(0,107).replace(/\s+\S*$/,'')+'…':genTitle,
+    'description':metaDesc||stripTags(sections(idx,'schema')).slice(0,300),
+    'datePublished':postedI,
+    'dateModified':dateModifiedIso
+  };
+  if(imgUrl) articleSchema.image=[imgUrl];
+  if(authorName){
+    articleSchema.author=[{'@type':'Person','name':authorName}];
+    if(authorUrl) articleSchema.author[0].url=authorUrl;
+  }
+  if(pubName){
+    articleSchema.publisher={'@type':'Organization','name':pubName};
+    if(pubLogo) articleSchema.publisher.logo={'@type':'ImageObject','url':pubLogo};
+  }
+  if(postUrl) articleSchema.mainEntityOfPage={'@type':'WebPage','@id':postUrl};
+  var articleLd=SC_OPEN_LD+'\n'+ldStringify(articleSchema)+'\n'+SC_CLOSE;
+
+  /* ---------- visible HTML ---------- */
+  var tbl='<table style="width:100%;border-collapse:collapse;margin:20px 0;font-family:Arial,sans-serif;">\n';
+  rows.forEach(function(r){
+    tbl+='  <tr>\n    <td style="padding:10px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:35%;">'+r[0]+'</td>\n    <td style="padding:10px;border:1px solid #ddd;">'+r[1]+'</td>\n  </tr>\n';
+  });
+  tbl+='</table>';
+
+  var img=imgUrl?'<div style="text-align:center;margin:20px 0;"><img src="'+esc(imgUrl)+'" alt="'+esc(origTitle)+'" loading="lazy" style="max-width:100%;height:auto;border-radius:6px;"/></div>':'';
+  var metaPara=metaDesc?'<p style="font-size:16px;color:#444;line-height:1.7;max-width:720px;margin:0 0 20px;">'+esc(metaDesc)+'</p>':'';
+
+  var cityPara='';
+  if(extraCities.length){
+    cityPara='<p style="font-size:13px;color:#666;margin:24px 0 0;"><strong>The source advert also lists this post in:</strong> '+esc(extraCities.map(function(c){return c[0];}).join(', '))+' ('+esc(province)+'). Confirm each location against the official advert before applying.</p>';
+  }
+
+  var applyBtn='';
+  if(expired){
+    applyBtn='<p style="text-align:center;font-style:italic;color:#888;">Applications for this position are closed.</p>';
+  } else if(applyUrl){
+    applyBtn='<div style="text-align:center;margin:24px 0;"><a href="'+esc(applyUrl)+'" target="_blank" rel="noopener nofollow" style="display:inline-block;background:#FF7A00;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-size:16px;font-weight:bold;">Apply for this position</a></div>';
+  }
+
+  /* Visible source + freshness line. No nofollow: a government source is a trust signal. */
+  var sourceHtml='';
+  if(srcUrl||lastChecked){
+    var srcLogo=(f('sourceLogo',idx).value||'').trim();
+    sourceHtml='<p style="font-size:13px;color:#555;margin:22px 0 0;border-top:1px solid #eee;padding-top:12px;">'+
+      (srcLogo&&isUrl(srcLogo)?'<img src="'+esc(srcLogo)+'" alt="'+esc(srcLabel||'Official source')+' logo" width="56" height="56" loading="lazy" style="vertical-align:middle;margin-right:10px;border-radius:4px;"/>':'')+
+      (srcUrl?'<strong>Official source:</strong> <a href="'+esc(srcUrl)+'" rel="noopener" target="_blank">'+esc(srcLabel||srcUrl)+'</a>':'')+
+      (srcUrl&&lastChecked?' &middot; ':'')+
+      (lastChecked?'<strong>Last checked:</strong> '+esc(fmtDay(lastChecked)):'')+'</p>';
+  }
+  var safeNote='<p style="font-size:13px;color:#555;margin:14px 0 0;background:#f4faf6;border:1px solid #cfe9d8;border-radius:6px;padding:10px 14px;"><strong>Never pay to apply.</strong> Legitimate employers and government departments do not charge application fees. If anyone asks you for money, it is a scam.</p>';
+
+  var expiredBanner=expired?'<div style="background:#f8d7da;border:1px solid #f5c6cb;border-radius:6px;padding:14px 18px;margin-bottom:18px;"><strong style="color:#721c24;">This job listing has closed. Applications are no longer being accepted.</strong></div>\n':'';
+
+  var wrapId='jp-'+slugId(jobRef);
+  var expiryBody=[
+    '(function(){',
+    '  var c=new Date("'+closingI+'");',
+    '  if(new Date()<=c) return;',
+    '  var w=document.getElementById("'+wrapId+'");',
+    '  if(!w) return;',
+    '  var d=document.createElement("div");',
+    '  d.setAttribute("style","background:#f8d7da;border:1px solid #f5c6cb;border-radius:6px;padding:20px 24px;text-align:center;font-family:Arial,sans-serif;");',
+    '  var h=document.createElement("h2");',
+    '  h.setAttribute("style","color:#721c24;margin:0 0 8px;");',
+    '  h.textContent="Position Closed";',
+    '  var p1=document.createElement("p");',
+    '  p1.setAttribute("style","color:#721c24;margin:0;");',
+    '  p1.innerHTML="Applications for <strong>'+origTitle.replace(/"/g,'&quot;')+'</strong> are no longer accepted.";',
+    '  var p2=document.createElement("p");',
+    '  p2.setAttribute("style","color:#999;font-size:13px;margin-top:10px;");',
+    '  p2.textContent="Closing date: '+closingV+'";',
+    '  d.appendChild(h);d.appendChild(p1);d.appendChild(p2);',
+    '  w.innerHTML="";w.appendChild(d);',
+    '})();'
+  ].join('\n');
+  var expiryScript=SC_OPEN+'\n'+expiryBody+'\n'+SC_CLOSE;
+
+  var wrapOpen='<div id="'+wrapId+'" data-job-closing="'+esc(closingI)+'" style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;">';
+
+  /* Structured data goes LAST so Blogger never builds the permalink from it. */
+  var out=wrapOpen+'\n\n'+crumbNav+'\n'+expiredBanner+
+    metaPara+'\n\n'+img+'\n\n'+tbl+'\n\n'+
+    '<h2 style="color:#333;">About this '+esc(origTitle)+' position</h2>\n\n'+sections(idx,'html')+'\n\n'+
+    applyBtn+'\n\n'+cityPara+'\n\n'+sourceHtml+'\n\n'+safeNote+'\n\n'+otherJobsTableHTML()+'\n\n'+
+    '</div>\n\n'+expiryScript+'\n\n'+jsonLd+'\n\n'+(crumbLd?crumbLd+'\n\n':'')+articleLd;
+
+  f('outPost',idx).value=out;
+
+  /* ---------- Blogger settings helper ---------- */
+  var settings=
+    'PERMALINK (Post settings > Permalink > Custom; cannot be changed after publishing)\n'+jobSlug(idx)+'\n\n'+
+    'SEARCH DESCRIPTION (Post settings > Search description; keep under 150 characters)\n'+(metaDesc.slice(0,150)||'(add a Meta Description)')+'\n\n'+
+    'LABELS (create the breadcrumb hub pages; sent automatically when you publish from the Publish tab)\n'+(jobLabels(idx).join(', ')||'(none)')+'\n\n'+
+    'HUB URLS USED IN THE BREADCRUMB\n'+crumbs.filter(function(c){return c[1];}).map(function(c){return c[0]+': '+c[1];}).join('\n');
+  f('outSettings',idx).value=settings;
+
+  jobLint(idx,schema,{hasApply:!!(applyUrl||applyEmail||scrub(f('dApply',idx).value)),hasCrumbs:!!site,expired:expired});
+
+  var jumpTo=document.getElementById('copyPost_'+idx);
+  if(jumpTo && typeof jumpTo.scrollIntoView==='function') jumpTo.scrollIntoView({behavior:'smooth'});
+}
+
+function go(idx){
+  clearErrs(idx);
+  if(validate(idx)){buildPost(idx);updateBanner(idx);updateSeo(idx);return true;}
+  return false;
+}
+
+/* ============================================================ THEME GADGET ============================================================ */
+
+function buildGadget(){
+  var SC_OPEN='\x3Cscript\x3E', SC_CLOSE='\x3C/script\x3E';
+  var lines=[
+    '<!-- BLOGGER AUTO-HIDE EXPIRED JOB POSTS',
+    '  HOW TO INSTALL: Blogger Dashboard > Theme > Edit HTML, find </body> and paste this block just above it. One-time install only.',
+    '-->',
+    SC_OPEN,
+    '(function(){',
+    '  function run(){',
+    '    var sels=[".post-outer",".post","article.post",".blog-post",".post-outer-container"];',
+    '    sels.forEach(function(sel){',
+    '      document.querySelectorAll(sel).forEach(function(card){',
+    '        var el=card.querySelector("[data-job-closing]");',
+    '        if(!el) return;',
+    '        var d=new Date(el.getAttribute("data-job-closing"));',
+    '        if(!isNaN(d)&&new Date()>d) card.style.display="none";',
+    '      });',
+    '    });',
+    '  }',
+    '  document.readyState==="loading" ? document.addEventListener("DOMContentLoaded",run) : run();',
+    '})();',
+    SC_CLOSE
+  ];
+  document.getElementById('outGadget').value=lines.join('\n');
+}
+
+/* ============================================================ BLOGGER OAUTH + PUBLISH ============================================================ */
+
+var tokenClient=null, accessToken=null, tokenExpiry=0;
+
+function setBloggerStatus(kind,msg){
+  var el=document.getElementById('bloggerStatus');
+  el.className='status-pill '+(kind==='ok'?'status-ok':kind==='err'?'status-err':'status-idle');
+  el.textContent=msg;
+}
+
+function connectBlogger(){
+  var cid=document.getElementById('clientId').value.trim();
+  var bid=document.getElementById('blogId').value.trim();
+  if(!cid||!bid){setBloggerStatus('err','Enter both your Client ID and Blog ID first');return;}
+  if(typeof google==='undefined' || !google.accounts){
+    setBloggerStatus('err','Google Sign-In script did not load — check your internet connection and reload');return;
+  }
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:cid,
+    scope:'https://www.googleapis.com/auth/blogger',
+    callback:function(resp){
+      if(resp.error){setBloggerStatus('err','Connection failed: '+resp.error);return;}
+      accessToken=resp.access_token;
+      tokenExpiry=Date.now()+((resp.expires_in||3600)*1000);
+      setBloggerStatus('ok','Connected to Blogger ✓ (session valid ~1 hour)');
+    }
+  });
+  tokenClient.requestAccessToken({prompt:accessToken?'':'consent'});
+}
+
+function logPublish(msg){
+  var box=document.getElementById('publishLog');
+  var time=new Date().toLocaleTimeString();
+  box.textContent = (box.textContent==='Publish activity will appear here…'?'':box.textContent+'\n') + '['+time+'] '+msg;
+  box.scrollTop=box.scrollHeight;
+}
+
+async function publishToBlogger(idx){
+  if(!accessToken || Date.now()>tokenExpiry){setBloggerStatus('err','Not connected — click Connect to Blogger first');logPublish('Job '+idx+': not connected.');return;}
+  if(!f('outPost',idx).value.trim()){
+    var okGen=go(idx);
+    if(!okGen){logPublish('Job '+idx+': fix the highlighted fields, then try again.');return;}
+  }
+  var blogId=document.getElementById('blogId').value.trim();
+  var draft=document.getElementById('saveDraft').checked;
+  var url='https://www.googleapis.com/blogger/v3/blogs/'+encodeURIComponent(blogId)+'/posts'+(draft?'?isDraft=true':'');
+  logPublish('Job '+idx+': publishing…');
+  try{
+    var res=await fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({title:f('genTitle',idx).value||f('title',idx).value,content:f('outPost',idx).value,labels:jobLabels(idx)})});
+    var data=await res.json();
+    if(!res.ok){logPublish('Job '+idx+': failed — '+(data.error&&data.error.message||res.status));return;}
+    logPublish('Job '+idx+': '+(draft?'saved as draft ✓':'published ✓')+' — '+(data.url||data.selfLink||'check Blogger dashboard'));
+  }catch(e){
+    logPublish('Job '+idx+': network error — '+e.message);
+  }
+}
+
+async function publishBoth(){
+  await publishToBlogger(1);
+  await publishToBlogger(2);
+}
+
+/* ============================================================ CLIPBOARD ============================================================ */
+
+function copyText(id){
+  var el=document.getElementById(id);
+  el.select();
+  try{document.execCommand('copy');}catch(e){}
+  if(navigator.clipboard){navigator.clipboard.writeText(el.value).catch(function(){});}
+  alert('Copied to clipboard!');
+}
+
+</script>
+<script>
+/* ===== OneCareer Bulk Publisher: uses the original generator above (buildPost/validate) unchanged ===== */
+var $=function(i){return document.getElementById(i)},J=[],OC=[],used={},N=0,TOK='https://oc-upload.invalid/',tok=null,tokExp=0,imgTarget=null,tc=null;
+var CF=['clientId','blogId','siteUrl','authorName','authorUrl','pubName','pubLogo','defImg','schemaImg','nLinks'];
+var cv=function(k){return($(k).value||'').trim()},p2=function(n){return('0'+n).slice(-2)},sleep=function(m){return new Promise(function(r){setTimeout(r,m)})};
+var X=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+function log(m){var b=$('log');b.textContent=(b.textContent.indexOf('Activity')===0?'':b.textContent+'\n')+'['+new Date().toLocaleTimeString()+'] '+m;b.scrollTop=1e9}
+function show(n){document.querySelectorAll('section').forEach(function(s){s.classList.toggle('on',s.id==='s'+n)});document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t==n)});if(n==3)render();if(n==4)cnt()}
+function save(){try{var o={draft:$('draft').checked};CF.forEach(function(k){o[k]=$(k).value});localStorage.setItem('ocb',JSON.stringify(o))}catch(e){}}
+/* ---------- parsing ---------- */
+var SYN={title:'jobtitle title position vacancy role post',jobRef:'reference ref jobref referencenumber refno jobid id',orgName:'employer company department organisation organization',category:'category',province:'province',city:'city town location',closing:'closingdate closing deadline closes',datePosted:'dateposted posted',empRaw:'employmenttype type',dIntro:'introduction intro summary overview',dCompany:'aboutcompany aboutthecompany about',dResp:'responsibilities duties',dQual:'requirements qualifications requirement',dBenefits:'benefits',dApply:'howtoapply apply',salMin:'salarymin minimumsalary',salMax:'salarymax maximumsalary',salUnit:'salaryunit',salary:'salary remuneration stipend',applyUrl:'applylink applyurl link',applyEmail:'applyemail email',eduReq:'education',expMonths:'experiencemonths experience',orgUrl:'employerwebsite website',orgLogo:'logourl logo',imgUrl:'imageurl image',sourceUrl:'sourceurl',sourceLabel:'sourcelabel',streetAddress:'streetaddress address',duration:'duration',focusKeyword:'focuskeyword keyword',metaDesc:'metadescription'};
+var HM={};for(var k in SYN)SYN[k].split(' ').forEach(function(a){HM[a]=k});
+var norm=function(h){return String(h).toLowerCase().replace(/[^a-z0-9]/g,'')};
+var LBL={title:/^(?:job\s*title|position|post|vacancy|role)\s*[:\-–]\s*(.+)/i,jobRef:/^(?:ref(?:erence)?(?:\s*(?:no\.?|number|#))?|job\s*(?:id|ref\w*))\s*[:\-–#]\s*(.+)/i,orgName:/^(?:company|employer|department|organi[sz]ation|municipality|institution)\s*[:\-–]\s*(.+)/i,loc:/^(?:location|city|town|place|region|province)\s*[:\-–]\s*(.+)/i,closing:/^(?:closing(?:\s*date)?|closes?|deadline|apply\s*by)\s*[:\-–]\s*(.+)/i,salary:/^(?:salary|remuneration|package|stipend|pay)\s*[:\-–]\s*(.+)/i,applyUrl:/^(?:apply(?:\s*(?:link|url|online))?|link)\s*[:\-–]\s*(https?:\/\/\S+)/i};
+var SEC=[['dIntro',/^(?:introduction|overview|job\s*summary|summary|purpose|description)/i],['dCompany',/^about(?:\s+the)?(?:\s+(?:company|us|department|organi[sz]ation))?/i],['dResp',/^(?:key\s+)?(?:duties|responsibilit\w+|job\s*purpose|key\s*performance\s*areas)/i],['dQual',/^(?:minimum\s+)?(?:requirements?|qualifications?|skills)(?:\s*(?:&|and)\s*\w+)?/i],['dBenefits',/^(?:benefits|perks|we\s*offer)/i],['dApply',/^(?:how\s+to\s+apply|application\s*procedure|enquiries|applications?)/i]];
+var BUL=/^\s*[•·▪●◦■\u2022\-–*]\s*/;
+function parseBlock(t){var r={},cur=null,free=[],L=t.split('\n').map(function(x){return x.trim()}).filter(Boolean);
+ L.forEach(function(l,i){var m,hit=0;for(var k in LBL)if(m=l.match(LBL[k])){r[k]=m[1].trim();cur=null;hit=1;break}if(hit)return;
+  if(/@/.test(l)&&/^(?:apply|send|email|submit|applications?)/i.test(l)){r.dApply=(r.dApply?r.dApply+'\n':'')+l;cur=null;return}
+  for(var s=0;s<SEC.length;s++){if(m=l.match(SEC[s][1])){var rest=l.slice(m[0].length);if(/^\s*:/.test(rest)||!rest.trim()){cur=SEC[s][0];var in_=rest.replace(/^\s*:\s*/,'');r[cur]=in_?in_:'';return}}}
+  var line=BUL.test(l)?'- '+l.replace(BUL,''):l;if(cur)r[cur]=(r[cur]?r[cur]+'\n':'')+line;else if(i>0||r.title)free.push(line)});
+ if(!r.title&&L.length)r.title=L[0].slice(0,120);if(!r.dIntro)r.dIntro=free.filter(function(x){return x!==r.title}).slice(0,6).join(' ').slice(0,600);return r}
+var MO='jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+function pd(s){s=String(s||'');var m,y,mo,d;
+ if(m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/)){y=+m[1];mo=+m[2];d=+m[3]}
+ else if(m=s.match(/(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/)){d=+m[1];mo=+m[2];y=+m[3]}
+ else if(m=s.match(/(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})\.?,?\s+(\d{4})/i)){d=+m[1];mo=MO.indexOf(m[2].toLowerCase().slice(0,3))+1;y=+m[3]}
+ else if(m=s.match(/([a-z]{3,9})\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/i)){mo=MO.indexOf(m[1].toLowerCase().slice(0,3))+1;d=+m[2];y=+m[3]}
+ if(!y||!mo||!d)return'';var t=s.match(/(\d{1,2})[:h](\d{2})/);return y+'-'+p2(mo)+'-'+p2(d)+'T'+(t?p2(t[1])+':'+t[2]:'23:59')}
+function geo(r,txt){var P=Object.keys(PROVINCE_CITIES),al={kzn:'KwaZulu-Natal','kwazulu natal':'KwaZulu-Natal','north-west':'North West',nw:'North West',wc:'Western Cape',ec:'Eastern Cape',fs:'Free State',nc:'Northern Cape'},srcs=[(r.province||'')+' '+(r.city||'')+' '+(r.loc||''),txt];
+ if(!PROVINCE_CITIES[r.province]){r.province='';srcs.forEach(function(s){if(r.province)return;var l=' '+s.toLowerCase()+' ';P.forEach(function(p){if(!r.province&&l.indexOf(p.toLowerCase())>-1)r.province=p});for(var a in al)if(!r.province&&new RegExp('\\b'+a+'\\b','i').test(s))r.province=al[a]})}
+ srcs.forEach(function(s){if(r.city&&r.province)return;(r.province?[r.province]:P).forEach(function(p){PROVINCE_CITIES[p].forEach(function(c){if(!r.city&&new RegExp('\\b'+c[0].replace(/[()]/g,'\\$&')+'\\b','i').test(s)){r.city=c[0];if(!r.province)r.province=p}})})})}
+function ps(s,r){if(!s)return;var n=(String(s).replace(/(\d)[\s,](?=\d{3}\b)/g,'$1').match(/\d+(?:\.\d+)?/g)||[]).map(Number).filter(function(x){return x>=100}).slice(0,2);if(n.length&&!r.salMin){r.salMin=Math.min.apply(0,n);r.salMax=Math.max.apply(0,n)}
+ var u=/hour|\bhr\b/i.test(s)?'HOUR':/\bday/i.test(s)?'DAY':/week/i.test(s)?'WEEK':/month|p\.?m\b/i.test(s)?'MONTH':/annum|year|p\.?a\b|annual|ctc/i.test(s)?'YEAR':'';if(u&&!r.salUnit)r.salUnit=u}
+var CAT=[[/saps|police/,'SAPS'],[/bank|fnb|absa|nedbank|capitec/,'Bank'],[/hospital|nurs|clinic/,'Hospital'],[/department of education|teacher|school/,'Department of Education'],[/department of health/,'Department of Health'],[/municipal/,'Municipality'],[/call cent/,'Call center'],[/pharmac/,'Pharmacy'],[/driver/,'Driver'],[/clean/,'Cleaner'],[/construct/,'Construction'],[/engineer/,'Engineering'],[/retail|cashier|shop|store/,'Retail'],[/messenger/,'Messenger'],[/house\s?keep/,'House keeper'],[/general worker|labourer/,'General Worker'],[/matric|grade 12/,'Matric'],[/roads|transport/,'Department of Roads and Transport'],[/government|department of/,'Government']];
+var ET=[[/full[\s-]?time|permanent/,'FULL_TIME'],[/part[\s-]?time/,'PART_TIME'],[/contract/,'CONTRACTOR'],[/\btemp/,'TEMPORARY'],[/intern|learnership|\bwil\b|trainee|apprentic|bursary/,'INTERN'],[/volunteer/,'VOLUNTEER']];
+function fin(r,txt){var d=new Date(),ymd=d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),m;r.id='j'+(++N);r.title=String(r.title||'').replace(/\s+/g,' ').trim();
+ r.jobRef=r.jobRef||'OC'+ymd.replace(/-/g,'')+'-'+N;ps(r.salary,r);ps(r.salary?'':txt.match(/(?:salary|remuneration|stipend|package)[^\n]{0,80}/i),r);
+ var cs=r.closing;r.closing=pd(cs);if(!r.closing&&(m=txt.match(/(?:clos\w*|deadline|apply\s*by)[^\n]{0,50}/i)))r.closing=pd(m[0]);
+ r.datePosted=pd(r.datePosted)||ymd+'T08:00';var ml=d>=new Date(r.datePosted+':00+02:00')?0:1;if(ml)r.datePosted=localDT();
+ geo(r,txt);var h=(r.title+' '+(r.orgName||'')).toLowerCase();if(CATEGORIES.indexOf(r.category)<0){r.category='';CAT.some(function(c){if(c[0].test(h)){r.category=c[1];return 1}})}
+ var es=(r.title+' '+(r.empRaw||'')+' '+txt.slice(0,500)).toLowerCase();r.empType=[];ET.forEach(function(e){if(e[0].test(es))r.empType.push(e[1])});if(!r.empType.length)r.empType=['FULL_TIME'];
+ if(!r.applyEmail&&(m=txt.match(/[^\s@<>()]+@[^\s@<>()]+\.[a-z]{2,}/i)))r.applyEmail=m[0].replace(/[.,;]$/,'');
+ if(!r.applyUrl&&(m=txt.match(/https?:\/\/[^\s)>"]+/)))r.applyUrl=m[0].replace(/[.,;]$/,'');if(r.applyUrl&&isBareHomepage(r.applyUrl))r.applyUrl='';
+ if(!r.dApply&&!r.applyUrl&&!r.applyEmail)r.dApply='See the official advert for application instructions.';
+ if(!r.dIntro)r.dIntro=(r.dCompany||'').split('\n')[0]||(r.orgName||'An employer')+' is hiring a '+r.title+(r.city?' in '+r.city+(r.province?', '+r.province:''):'')+'. Review the requirements below and apply before the closing date.';
+ r.directApply=false;r.links=[];return r}
+function geoTitle(r){return r.title+(r.orgName?' at '+r.orgName:'')+(r.city?', '+r.city:'')+' ('+new Date().getFullYear()+')'}
+/* ---------- readers ---------- */
+async function readXlsx(f){var wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),o=[];wb.SheetNames.forEach(function(n){XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:'',raw:false}).forEach(function(row){var r={},t=[];for(var h in row){var v=String(row[h]).trim();if(!v)continue;t.push(v);var k=HM[norm(h)];if(k)r[k]=v}if(r.title)o.push(fin(r,t.join('\n')))})});return o}
+async function readUnits(f,ext){var u=[];
+ if(ext==='pdf'){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';var pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
+  for(var p=1;p<=pdf.numPages;p++){var c=await(await pdf.getPage(p)).getTextContent(),rows={};c.items.forEach(function(i){var y=Math.round(i.transform[5]/3);(rows[y]=rows[y]||[]).push([i.transform[4],i.str])});
+   u.push(Object.keys(rows).sort(function(a,b){return b-a}).map(function(y){return rows[y].sort(function(a,b){return a[0]-b[0]}).map(function(c){return c[1]}).join(' ')}).join('\n'))}}
+ else{var z=await JSZip.loadAsync(await f.arrayBuffer()),nm=Object.keys(z.files).filter(function(n){return/^ppt\/slides\/slide\d+\.xml$/.test(n)}).sort(function(a,b){return a.match(/(\d+)\.xml/)[1]-b.match(/(\d+)\.xml/)[1]});
+  for(var i=0;i<nm.length;i++){var x=await z.file(nm[i]).async('string');u.push((x.match(/<a:p[ >][\s\S]*?<\/a:p>/g)||[]).map(function(p){return(p.match(/<a:t[^>]*>[^<]*<\/a:t>/g)||[]).map(function(t){return t.replace(/<[^>]+>/g,'')}).join('')}).filter(Boolean).join('\n').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'"))}}
+ var o=[];u.forEach(function(t){t.split(/\n(?=\s*(?:job\s*title|position|vacancy)\s*[:\-–])/i).forEach(function(b){if(b.trim().length>40){var r=parseBlock(b);if(r.title)o.push(fin(r,b))}})});return o}
+async function handle(files){var up=$('up');up.textContent='Reading…';var tot=0;
+ for(var i=0;i<files.length;i++){var f=files[i],ext=f.name.split('.').pop().toLowerCase();try{var r=/xlsx|xls|csv/.test(ext)?await readXlsx(f):/pdf|pptx/.test(ext)?await readUnits(f,ext):[];r.forEach(function(x){x.sel=0;J.push(x)});tot+=r.length;log(f.name+': '+r.length+' job(s) found')}catch(e){log(f.name+': could not read — '+e.message)}}
+ up.textContent=tot+' job(s) added.';if(tot){await prep();show(3)}}
+/* ---------- engine bridge ---------- */
+function build(r){var T=['jobRef','title','category','focusKeyword','metaDesc','dIntro','dCompany','dResp','dQual','dBenefits','dApply','eduReq','expMonths','datePosted','closing','orgName','orgLogo','orgUrl','salMin','salMax','salUnit','applyUrl','applyEmail','streetAddress','duration','sourceUrl','sourceLabel','deptLabel'];
+ clearErrs(1);T.forEach(function(k){f(k,1).value=r[k]==null?'':r[k]});
+ var md=(r.metaDesc||'').trim();if(!md){md=(r.dIntro||'').replace(/\s+/g,' ').trim();if(md.length>155)md=md.slice(0,152).replace(/\s+\S*$/,'')+'…'}f('metaDesc',1).value=md.length>=70?md:'';
+ f('genTitle',1).value=r.genTitle||geoTitle(r);f('province',1).value=r.province||'';updateCityList(1);f('city',1).value=r.city||'';updatePostal(1);if(r.postal)f('postal',1).value=r.postal;
+ Array.from(f('empType',1).options).forEach(function(o){o.selected=(r.empType||[]).indexOf(o.value)>-1});
+ ['remote','multiLoc','anonEmployer','multiLocConfirm'].forEach(function(k){f(k,1).checked=false});f('directApply',1).checked=!!r.directApply;
+ f('siteUrl',1).value=cv('siteUrl');f('authorName',1).value=cv('authorName');f('authorUrl',1).value=cv('authorUrl');f('pubName',1).value=cv('pubName');f('pubLogo',1).value=cv('pubLogo');
+ var d=new Date();f('lastChecked',1).value=d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+ f('imgUrl',1).value=r.img?TOK+r.id:(r.imgUrl||cv('defImg'));
+ otherJobs=(r.links||[]).filter(function(l){return l.name&&l.url});
+ var oc=window.confirm,w=[];window.confirm=function(m){w.push(m.split('\n')[0]);return true};var ok;try{ok=validate(1)}finally{window.confirm=oc}
+ var er=[].slice.call(document.querySelectorAll('#panel-job1 .error')).map(function(e){return e.textContent}).filter(Boolean);
+ if(!ok)return{ok:0,errors:er.length?er:['Check required fields']};
+ buildPost(1);var h=f('outPost',1).value;
+ if(r.img){h=h.split('src="'+TOK+r.id+'"').join('src="'+r.img+'"');var rep=cv('schemaImg');
+  h=h.replace(/(<script type="application\/ld\+json">\n)([\s\S]*?)(\n<\/script>)/g,function(m,a,b,c){try{var o=JSON.parse(b);(function wk(x){if(Array.isArray(x)){for(var i=x.length-1;i>=0;i--){if(x[i]===TOK+r.id){if(rep)x[i]=rep;else x.splice(i,1)}else wk(x[i])}}else if(x&&typeof x==='object')for(var k in x){if(x[k]===TOK+r.id){if(rep)x[k]=rep;else delete x[k]}else wk(x[k])}})(o);return a+ldStringify(o)+c}catch(e){return m}})}
+ return{ok:1,html:h,title:f('genTitle',1).value||r.title,labels:jobLabels(1),warn:w}}
+function check(r){try{r.st=build(r)}catch(e){r.st={ok:0,errors:['Engine error: '+e.message]}}}
+async function prep(){if(!OC.length)await loadOC(true);J.forEach(function(r){if(!r.links.length)assign(r);check(r)});render()}
+/* ---------- OneCareer links ---------- */
+function jsonp(u){return new Promise(function(res,rej){var cb='occb'+Date.now(),s=document.createElement('script'),t=setTimeout(function(){rej(new Error('timeout'))},15000);window[cb]=function(d){clearTimeout(t);res(d);s.remove()};s.onerror=function(){rej(new Error('blocked'))};s.src=u+'&alt=json-in-script&callback='+cb;document.head.appendChild(s)})}
+async function loadOC(quiet){var site=cv('siteUrl').replace(/\/+$/,''),u=site+'/feeds/posts/default?max-results=500',d;
+ try{var rs=await fetch(u+'&alt=json');d=await rs.json()}catch(e){try{d=await jsonp(u)}catch(e2){log('Could not read '+site+' feed ('+e2.message+'). Links left empty.');return}}
+ OC=((d.feed&&d.feed.entry)||[]).map(function(e){var l=(e.link||[]).filter(function(x){return x.rel==='alternate'})[0];return{t:e.title.$t,u:l&&l.href,c:(e.category||[]).map(function(c){return c.term.toLowerCase()}),d:e.published.$t}}).filter(function(e){return e.u});
+ log('OneCareer: '+OC.length+' posts loaded for linking.')}
+function assign(r){var n=+cv('nLinks')||0,ks=[r.province,r.deptLabel||r.orgName,r.category].filter(Boolean).map(function(x){return x.toLowerCase()}),w=(r.title||'').toLowerCase().split(/\W+/).filter(function(x){return x.length>3});
+ var sc=OC.filter(function(e){return e.t.toLowerCase().indexOf((r.jobRef||'~~').toLowerCase())<0&&e.t.toLowerCase().indexOf((r.title||'~~').toLowerCase())<0}).map(function(e){var s=0;ks.forEach(function(k){if(e.c.indexOf(k)>-1)s+=3});w.forEach(function(x){if(e.t.toLowerCase().indexOf(x)>-1)s+=1});return{e:e,s:s-(used[e.u]||0)*.4+(new Date(e.d)/1e13)}}).sort(function(a,b){return b.s-a.s}).slice(0,n);
+ r.links=sc.map(function(x){used[x.e.u]=(used[x.e.u]||0)+1;return{name:x.e.t,url:x.e.u}})}
+/* ---------- review UI ---------- */
+function render(){var tb=$('tb');tb.innerHTML=J.map(function(r,i){var s=r.st||{};return'<tr><td><input type="checkbox" '+(r.sel?'checked ':'')+(s.ok&&!r.posted?'':'disabled ')+'onchange="J['+i+'].sel=this.checked;cnt()"></td><td>'+(i+1)+'</td><td><b>'+X(r.title)+'</b><div class="hint">'+X(r.jobRef)+'</div></td><td>'+X(r.orgName)+'</td><td>'+X(r.city)+(r.province?', '+X(r.province):'')+'</td><td>'+X((r.closing||'').replace('T',' '))+'</td><td>'+((r.img||r.imgUrl)?'<img class="th" src="'+X(r.img||r.imgUrl)+'">':'')+' <button class="btn o s" onclick="pick('+i+')">'+(r.img?'Change':'Upload')+'</button></td><td>'+r.links.length+'</td><td>'+(r.posted?'<span class="pill ok">Sent ✓</span>':s.ok?'<span class="pill ok">Ready</span>':'<span class="pill er" title="'+X((s.errors||[]).join(' | '))+'">'+((s.errors||[]).length||1)+' issue(s)</span>')+'</td><td><button class="btn o s" onclick="edit('+i+')">Edit</button></td></tr>'}).join('')||'<tr><td colspan="10" class="hint">No jobs yet — upload a file first.</td></tr>';
+ var ok=J.filter(function(r){return r.st&&r.st.ok}).length;$('sum').textContent=J.length+' jobs · '+ok+' ready · '+(J.length-ok)+' need attention';cnt()}
+function cnt(){var n=J.filter(function(r){return r.sel&&r.st&&r.st.ok&&!r.posted}).length;$('cnt').textContent=n+' selected'+(n>50?' — only the first 50 will be sent per run':'');$('send').textContent='Send '+Math.min(n,50)+' to Blogger'}
+async function comp(f){return new Promise(function(res){var im=new Image(),u=URL.createObjectURL(f);im.onload=function(){var s=Math.min(1,1200/im.width),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.8))};im.src=u})}
+function pick(i){imgTarget=i;$('imgf').click()}
+$('imgf').onchange=async function(){var f=this.files[0];this.value='';if(!f)return;var d=await comp(f);if(imgTarget==='all')J.forEach(function(r){if(!r.img&&!r.imgUrl){r.img=d;check(r)}});else{J[imgTarget].img=d;check(J[imgTarget])}render()};
+var FS=[['title','Job title'],['jobRef','Reference'],['orgName','Employer'],['category','Category','sel',CATEGORIES],['province','Province','sel',Object.keys(PROVINCE_CITIES)],['city','City'],['closing','Closing (SAST)','datetime-local'],['empType','Employment type (Ctrl/Cmd for several)','multi',['FULL_TIME','PART_TIME','CONTRACTOR','TEMPORARY','INTERN','VOLUNTEER','PER_DIEM','OTHER']],['salMin','Salary min (ZAR)','number'],['salMax','Salary max (ZAR)','number'],['salUnit','Salary unit','sel',['MONTH','YEAR','WEEK','DAY','HOUR']],['applyUrl','Apply link'],['applyEmail','Apply email'],['imgUrl','Image URL (optional)'],['dIntro','Introduction','ta'],['dResp','Responsibilities','ta'],['dQual','Qualifications','ta'],['dBenefits','Benefits','ta'],['dApply','How to apply','ta'],['metaDesc','Meta description (70–155 chars)','ta']];
+function edit(i){var r=J[i],h='<h2>Edit job '+(i+1)+'</h2><div class="g">'+FS.map(function(s){var v=r[s[0]]==null?'':r[s[0]],c;if(s[2]==='sel')c='<select data-k="'+s[0]+'"><option value=""></option>'+s[3].map(function(o){return'<option'+(o===v?' selected':'')+'>'+X(o)+'</option>'}).join('')+'</select>';else if(s[2]==='multi')c='<select multiple data-k="'+s[0]+'" size="4">'+s[3].map(function(o){return'<option'+(v.indexOf(o)>-1?' selected':'')+'>'+o+'</option>'}).join('')+'</select>';else if(s[2]==='ta')c='<textarea data-k="'+s[0]+'">'+X(v)+'</textarea>';else c='<input data-k="'+s[0]+'" type="'+(s[2]||'text')+'" value="'+X(v)+'">';return'<div'+(s[2]==='ta'?' style="grid-column:1/-1"':'')+'><label>'+s[1]+'</label>'+c+'</div>'}).join('')+'</div><h2 style="margin-top:16px">OneCareer apply links (shown in "Other Jobs To Apply")</h2>';
+ var n=Math.max(+cv('nLinks')||5,r.links.length);for(var k=0;k<n;k++){var l=r.links[k]||{name:'',url:''};h+='<div class="g" style="grid-template-columns:1fr 1fr;margin-bottom:6px"><input class="ln" placeholder="Job name" value="'+X(l.name)+'"><input class="lu" placeholder="https://www.onecareer.co.za/…" value="'+X(l.url)+'"></div>'}
+ h+='<div class="row"><button class="btn p" id="sv">Save &amp; validate</button><button class="btn o" id="pv">Preview post</button><button class="btn o" id="cl">Close</button></div><div id="mer" class="err"></div><div id="pvw"></div>';$('mb').innerHTML=h;$('modal').classList.add('on');
+ function grab(){document.querySelectorAll('#mb [data-k]').forEach(function(e){var k=e.dataset.k;r[k]=e.multiple?[].slice.call(e.selectedOptions).map(function(o){return o.value}):e.value.trim()});r.closing=r.closing||'';var a=[].slice.call(document.querySelectorAll('#mb .ln')),b=[].slice.call(document.querySelectorAll('#mb .lu'));r.links=a.map(function(x,j){return{name:x.value.trim(),url:b[j].value.trim()}}).filter(function(l){return l.name&&l.url});if(r.province&&PROVINCE_CITIES[r.province]&&!r.city)r.postal='';check(r)}
+ $('sv').onclick=function(){grab();render();$('mer').textContent=r.st.ok?'':(r.st.errors||[]).join(' · ');if(r.st.ok)$('modal').classList.remove('on')};
+ $('pv').onclick=function(){grab();$('mer').textContent=r.st.ok?'':(r.st.errors||[]).join(' · ');$('pvw').innerHTML=r.st.ok?'<iframe sandbox="" srcdoc="'+X(r.st.html)+'"></iframe>':''};$('cl').onclick=function(){$('modal').classList.remove('on')}}
+/* ---------- Blogger ---------- */
+function connect(){if(!cv('clientId')||!cv('blogId')){$('cst').className='pill er';$('cst').textContent='Enter Client ID and Blog ID';return}if(typeof google==='undefined'||!google.accounts){$('cst').className='pill er';$('cst').textContent='Google sign-in script not loaded';return}save();
+ tc=google.accounts.oauth2.initTokenClient({client_id:cv('clientId'),scope:'https://www.googleapis.com/auth/blogger',callback:function(r){if(r.error){$('cst').className='pill er';$('cst').textContent='Failed: '+r.error;return}tok=r.access_token;tokExp=Date.now()+(r.expires_in||3600)*1e3;$('cst').className='pill ok';$('cst').textContent='Connected ✓ (~1 hour)'}});tc.requestAccessToken({prompt:tok?'':'consent'})}
+async function post1(r){var u='https://www.googleapis.com/blogger/v3/blogs/'+encodeURIComponent(cv('blogId'))+'/posts'+($('draft').checked?'?isDraft=true':'');
+ for(var a=0;a<3;a++){var rs=await fetch(u,{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({kind:'blogger#post',title:r.st.title,content:r.st.html,labels:r.st.labels})}),d={};try{d=await rs.json()}catch(e){}
+  if(rs.ok)return d;if(rs.status===429||rs.status>=500){await sleep(2500*(a+1));continue}throw new Error((d.error&&d.error.message)||rs.status)}throw new Error('Rate limited — wait and retry')}
+async function send(){if(!tok||Date.now()>tokExp){show(1);$('cst').className='pill er';$('cst').textContent='Connect to Blogger first';return}
+ var q=J.filter(function(r){return r.sel&&r.st&&r.st.ok&&!r.posted}).slice(0,50);if(!q.length){log('Nothing selected.');return}$('send').disabled=true;var ok=0;
+ for(var i=0;i<q.length;i++){try{var d=await post1(q[i]);q[i].posted=d.url||1;ok++;q[i].sel=0;log((i+1)+'/'+q.length+' '+($('draft').checked?'draft saved':'published')+' ✓ '+q[i].title+' — '+(d.url||''))}catch(e){log((i+1)+'/'+q.length+' FAILED '+q[i].title+' — '+e.message);if(/quota|rate|limit/i.test(e.message)){log('Stopping: Blogger limit reached. Try again later.');break}}
+  $('pb').style.width=((i+1)/q.length*100)+'%';await sleep(1500)}
+ log('Done: '+ok+' of '+q.length+' sent.');$('send').disabled=false;render()}
+/* ---------- init ---------- */
+window.onload=function(){document.getElementById('panel-job1').innerHTML=jobFormHTML(1);document.getElementById('panel-job2').innerHTML=jobFormHTML(2);initProvinceSelects();
+ try{var o=JSON.parse(localStorage.getItem('ocb')||'{}');CF.forEach(function(k){if(o[k]!=null&&o[k]!=='')$(k).value=o[k]});if(o.draft!=null)$('draft').checked=o.draft}catch(e){}
+ CF.concat('draft').forEach(function(k){$(k).onchange=save});
+ document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){show(b.dataset.t)}});$('conn').onclick=connect;$('send').onclick=send;
+ var dr=$('drop');dr.onclick=function(){$('file').click()};$('file').onchange=function(){handle(this.files);this.value=''};
+ dr.ondragover=function(e){e.preventDefault();dr.classList.add('h')};dr.ondragleave=function(){dr.classList.remove('h')};dr.ondrop=function(e){e.preventDefault();dr.classList.remove('h');handle(e.dataTransfer.files)};
+ $('ocb').onclick=async function(){await loadOC();used={};J.forEach(function(r){assign(r);check(r)});render()};
+ $('rev').onclick=function(){J.forEach(check);render()};$('allimg').onclick=function(){imgTarget='all';$('imgf').click()};$('clr').onclick=function(){if(confirm('Clear all jobs?')){J=[];render()}};
+ $('selv').onclick=function(){var n=0;J.forEach(function(r){r.sel=0;if(r.st&&r.st.ok&&!r.posted&&n<50){r.sel=1;n++}});render()};
+ $('tpl').onclick=function(){var H=['Job Title','Reference','Employer','Category','Province','City','Closing Date','Date Posted','Employment Type','Introduction','About Company','Responsibilities','Requirements','Benefits','How To Apply','Salary Min','Salary Max','Salary Unit','Apply Link','Apply Email','Education','Experience Months','Employer Website','Logo URL','Image URL','Source URL','Source Label','Street Address','Duration','Focus Keyword','Meta Description'];
+  var ex=['Cashier','SHP-001','Shoprite','Retail','Limpopo','Polokwane','2026-12-15','2026-10-10','Full time','Join our team as a cashier at our Polokwane branch.','','- Serve customers\n- Handle cash','- Matric\n- 6 months experience','','Email your CV','4500','5500','MONTH','','hr@example.co.za','high school','6','','','','','','','','retail jobs Limpopo',''];
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([H,ex]),'Jobs');XLSX.writeFile(wb,'onecareer-jobs-template.xlsx')};
+ render()};
+
+</script></body></html>
